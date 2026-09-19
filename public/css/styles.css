@@ -1,0 +1,298 @@
+/* CompanionPal — Porcelain design system (GUI_PORCELAIN.md) */
+
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Newsreader:wght@400;600&display=swap");
+
+/* ── Tokens ──────────────────────────────────────────────────── */
+:root {
+  --bg: #F6F8F7; --surface: #FFFFFF; --ink: #16221F; --ink-soft: #4A5754;
+  --line: #DDE4E1; --primary: #0E5A5A; --primary-ink: #FFFFFF; --tint: #E4F0EE;
+  --safe-bg: #E7F5EC; --safe-ink: #17643A;
+  --care-bg: #FFF3D6; --care-ink: #7A4B00;
+  --scam-bg: #FDECEA; --scam-ink: #A51D14;
+  --font-head: "Newsreader", Georgia, serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+  --scale: 1;
+  --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px; --s5: 48px; --s6: 72px;
+  --radius: 14px; --tap: 60px;
+}
+:root[data-contrast="high"] {
+  --bg: #FFFFFF; --ink: #000000; --ink-soft: #1A1A1A; --line: #000000;
+  --primary: #003F3F; --tint: #E6F2F0;
+}
+
+/* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: calc(16px * var(--scale)); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 1.25rem/1.6 var(--font-body);
+}
+h1, h2 { font-family: var(--font-head); font-weight: 400; line-height: 1.2; margin: 0 0 var(--s1); }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+.greeting {
+  font-family: var(--font-head);
+  font-size: clamp(2.25rem, 7vw, 3rem);
+  line-height: 1.15; margin: 0;
+}
+p { margin: 0 0 var(--s2); max-width: 38rem; }
+p:last-child { margin-bottom: 0; }
+.soft { color: var(--ink-soft); }
+.small { font-size: 1.125rem; color: var(--ink-soft); }
+
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.page {
+  width: min(100% - 32px, 40rem);
+  margin: 0 auto;
+  padding: var(--s3) 0 var(--s5);
+}
+@media (min-width: 720px) { .page { padding-top: var(--s5); } }
+
+/* ── Top bar ─────────────────────────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s2);
+  min-height: 64px; padding: 0 var(--s2); border-bottom: 1px solid var(--line);
+  font-size: 1.125rem; background: var(--bg);
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar .links { display: flex; gap: var(--s3); align-items: center; }
+.topbar .a11y-controls { display: flex; gap: var(--s2); align-items: center; }
+/* On narrow screens, a11y controls drop below topbar */
+@media (max-width: 719px) {
+  .topbar { flex-wrap: wrap; row-gap: 0; padding: var(--s1) var(--s2); }
+  .topbar .a11y-controls {
+    width: 100%; padding: var(--s1) 0; border-top: 1px solid var(--line);
+    justify-content: flex-start;
+  }
+}
+.linkbtn {
+  display: inline-flex; align-items: center; gap: var(--s1); min-height: 48px;
+  background: none; border: 0; color: var(--primary); font: inherit; font-weight: 700;
+  cursor: pointer; padding: 0 4px; text-decoration: none; border-radius: 6px;
+}
+.linkbtn:hover { text-decoration: underline; }
+.linkbtn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: var(--s1);
+  width: 100%; min-height: var(--tap); padding: 0 var(--s3);
+  border: 2px solid var(--primary); border-radius: var(--radius);
+  background: var(--primary); color: var(--primary-ink);
+  font: 700 1.25rem var(--font-body); cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+  text-decoration: none;
+}
+.btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.btn:hover { background: #0a4747; border-color: #0a4747; }
+.btn:active { transform: translateY(1px); filter: brightness(0.92); }
+.btn.secondary { background: transparent; color: var(--primary); }
+.btn.secondary:hover { background: var(--tint); }
+.btn[aria-busy="true"] { pointer-events: none; opacity: 0.85; }
+.actions { display: flex; gap: 12px; margin-top: var(--s2); flex-wrap: wrap; }
+.actions .btn { flex: 1; min-width: 140px; }
+
+/* ── Home action rows ────────────────────────────────────────── */
+.row {
+  display: flex; align-items: center; gap: 14px; min-height: 76px;
+  padding: 12px var(--s2); margin-bottom: 12px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  color: inherit; text-decoration: none;
+  transition: background-color 150ms ease-out;
+  cursor: pointer; width: 100%;
+  /* reset button defaults */
+  font: inherit; text-align: left;
+}
+.row:hover, .row:active { background: var(--tint); }
+.row .icon { width: 26px; height: 26px; color: var(--primary); flex: none;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.row .label-group { flex: 1; min-width: 0; }
+.row .title { display: block; font-weight: 700; }
+.row .help { display: block; font-size: 1.125rem; line-height: 1.35; color: var(--ink-soft); }
+.row .chev { margin-left: auto; width: 20px; height: 20px; color: var(--ink-soft); flex: none;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Forms ───────────────────────────────────────────────────── */
+label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 1.125rem; }
+input[type="text"],
+input[type="password"],
+textarea {
+  width: 100%; padding: var(--s2); font: inherit; color: var(--ink);
+  background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+  font-size: 1.25rem;
+}
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+  border-color: var(--primary); outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 90, 90, 0.2);
+}
+textarea { min-height: 8rem; resize: vertical; }
+.field { margin-bottom: var(--s2); position: relative; }
+/* Mic button inside field */
+.field-wrap { position: relative; }
+.field-wrap input,
+.field-wrap textarea { padding-right: 56px; }
+.mic-btn {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: none; border: 2px solid var(--line); color: var(--primary);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background-color 150ms ease-out;
+}
+.mic-btn:hover { background: var(--tint); }
+.mic-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* For textarea, mic sits at top-right */
+.field-wrap--textarea .mic-btn { top: var(--s2); transform: none; }
+
+/* ── Answer box ──────────────────────────────────────────────── */
+.answer {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden; margin-top: var(--s3);
+}
+.answer .body { padding: var(--s3); }
+.answer .body p:last-child { margin-bottom: 0; }
+.answer-footer {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  padding: var(--s2) var(--s3); border-top: 1px solid var(--line);
+}
+.answer-footer .btn { width: auto; min-width: 140px; flex: none; }
+.disclaimer { font-size: 1.125rem; color: var(--ink-soft); margin: 0; }
+
+/* ── Verdict band (scam) ─────────────────────────────────────── */
+.verdict {
+  display: flex; align-items: center; gap: var(--s1);
+  padding: 12px var(--s3); font-weight: 700; font-size: 1.25rem;
+}
+.verdict svg { width: 24px; height: 24px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.verdict.safe { background: var(--safe-bg); color: var(--safe-ink); }
+.verdict.careful { background: var(--care-bg); color: var(--care-ink); }
+.verdict.scam { background: var(--scam-bg); color: var(--scam-ink); }
+
+.scam-body { padding: var(--s3); }
+.scam-body ul { margin: var(--s1) 0 var(--s2) var(--s3); padding: 0; }
+.scam-body li { margin-bottom: var(--s1); font-size: 1.125rem; }
+.what-to-do { font-weight: 700; margin-top: var(--s2); font-size: 1.125rem; }
+
+/* ── Step view ───────────────────────────────────────────────── */
+.progress { height: 6px; border-radius: 3px; background: var(--line); margin: 12px 0 var(--s3); }
+.progress > i { display: block; height: 100%; border-radius: 3px; background: var(--primary); transition: width 200ms ease-out; }
+.step-label { font-size: 1.125rem; color: var(--ink-soft); margin-bottom: var(--s1); font-weight: 700; }
+.step-text { font-family: var(--font-head); font-size: 1.5rem; line-height: 1.4; margin-bottom: var(--s2); }
+.step-tip { font-size: 1.125rem; color: var(--ink-soft); margin-bottom: var(--s4); }
+
+/* ── Chat ────────────────────────────────────────────────────── */
+.chat-log { display: flex; flex-direction: column; gap: 12px; margin-bottom: var(--s2); }
+.bubble {
+  max-width: 85%; padding: 12px var(--s2); border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--line); font-size: 1.25rem; line-height: 1.5;
+}
+.bubble.user { align-self: flex-end; background: var(--tint); border-color: var(--tint); }
+.bubble.assistant { align-self: flex-start; }
+.chat-input-bar {
+  display: flex; gap: 12px; align-items: flex-end; margin-top: var(--s2);
+}
+.chat-input-bar input {
+  flex: 1; min-width: 0;
+}
+
+/* ── My Day reminders ────────────────────────────────────────── */
+.reminder-list { list-style: none; padding: 0; margin: 0; }
+.reminder-list li {
+  display: flex; align-items: flex-start; gap: var(--s2);
+  padding: var(--s2) 0; border-bottom: 1px solid var(--line);
+  font-size: 1.125rem;
+}
+.reminder-list li:last-child { border-bottom: 0; }
+.reminder-time { font-weight: 700; min-width: 80px; flex: none; }
+.reminder-info { flex: 1; }
+.reminder-note { color: var(--ink-soft); font-size: 1rem; }
+.reminder-del {
+  background: none; border: 1px solid var(--line); border-radius: 8px;
+  color: var(--scam-ink); cursor: pointer; padding: 4px 10px;
+  font-size: 1rem; flex: none; min-height: 36px;
+}
+.reminder-del:hover { background: var(--scam-bg); }
+.empty-state { color: var(--ink-soft); font-size: 1.125rem; padding: var(--s2) 0; }
+
+/* ── Loading ─────────────────────────────────────────────────── */
+.loading {
+  color: var(--ink-soft); font-size: 1.125rem; padding: var(--s2) 0;
+  display: inline-flex; align-items: center;
+}
+.loading::after {
+  content: ""; display: inline-block; width: 10px; height: 10px; margin-left: 10px;
+  border-radius: 50%; background: var(--primary); animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.25; } }
+.fade-in { animation: fade 200ms ease-out; }
+@keyframes fade { from { opacity: 0; } }
+
+/* ── Error ───────────────────────────────────────────────────── */
+.error {
+  display: flex; gap: var(--s1); padding: var(--s2); border-radius: var(--radius);
+  background: var(--scam-bg); color: var(--scam-ink); font-size: 1.125rem;
+}
+.error svg { width: 22px; height: 22px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; margin-top: 2px; }
+
+/* ── Sample chips (reused on feature screens) ────────────────── */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: var(--s2) 0; }
+.chip {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 14px; font: 400 1rem var(--font-body); color: var(--ink);
+  cursor: pointer; transition: background-color 150ms ease-out;
+}
+.chip:hover { background: var(--tint); }
+
+/* ── Login page ──────────────────────────────────────────────── */
+.login-wrap {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: var(--s3);
+}
+.login-panel {
+  width: min(100%, 28rem); background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: var(--s4);
+}
+.login-panel .app-name {
+  font-family: var(--font-head); font-size: 2rem; font-weight: 400;
+  color: var(--primary); margin: 0 0 var(--s1);
+}
+.login-panel .tagline { font-size: 1.125rem; color: var(--ink-soft); margin-bottom: var(--s4); }
+.demo-box {
+  margin-top: var(--s3); padding: var(--s2); border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--bg);
+}
+.demo-box summary { font-weight: 700; cursor: pointer; font-size: 1.125rem; list-style: none; }
+.demo-box summary::-webkit-details-marker { display: none; }
+.demo-credentials { font-size: 1.125rem; margin-top: var(--s1); }
+.demo-credentials code { background: var(--tint); padding: 2px 6px; border-radius: 4px; }
+.demo-fill-btn {
+  background: none; border: 0; color: var(--primary); font: 700 1rem var(--font-body);
+  cursor: pointer; padding: 2px 0; text-decoration: underline; margin-top: 4px; display: block;
+}
+
+/* ── Section visibility ──────────────────────────────────────── */
+[hidden] { display: none !important; }
+
+/* ── Utility spacing ─────────────────────────────────────────── */
+.mt1 { margin-top: var(--s1); }
+.mt2 { margin-top: var(--s2); }
+.mt3 { margin-top: var(--s3); }
+.mt4 { margin-top: var(--s4); }
+.mt5 { margin-top: var(--s5); }
+.mb2 { margin-bottom: var(--s2); }
+.mb3 { margin-bottom: var(--s3); }
+
+/* ── No horizontal scroll guarantee ─────────────────────────── */
+html, body { overflow-x: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

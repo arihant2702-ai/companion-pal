@@ -24,25 +24,27 @@ const views = {
 // 1. Accessibility Management
 function applyAccessibilityPreferences() {
   const fontScale = window.CompanionStorage.getFontScale();
-  document.documentElement.style.setProperty('--font-scale', fontScale);
+  // Porcelain stylesheet uses --scale on :root
+  document.documentElement.style.setProperty('--scale', fontScale);
 
   const highContrast = window.CompanionStorage.getHighContrast();
+  const toggleBtn = document.getElementById('btn-high-contrast');
   if (highContrast) {
-    document.body.setAttribute('data-high-contrast', 'true');
-    const toggleBtn = document.getElementById('btn-high-contrast');
+    // Porcelain stylesheet uses data-contrast="high" on :root
+    document.documentElement.setAttribute('data-contrast', 'high');
     if (toggleBtn) toggleBtn.setAttribute('aria-pressed', 'true');
   } else {
-    document.body.removeAttribute('data-high-contrast');
-    const toggleBtn = document.getElementById('btn-high-contrast');
+    document.documentElement.removeAttribute('data-contrast');
     if (toggleBtn) toggleBtn.setAttribute('aria-pressed', 'false');
   }
 }
 
 function adjustFontSize(delta) {
   let current = window.CompanionStorage.getFontScale();
-  current = Math.min(1.4, Math.max(0.9, Math.round((current + delta) * 10) / 10));
+  // Three steps: 1, 1.15, 1.3
+  current = Math.min(1.3, Math.max(1.0, Math.round((current + delta) * 100) / 100));
   window.CompanionStorage.saveFontScale(current);
-  document.documentElement.style.setProperty('--font-scale', current);
+  document.documentElement.style.setProperty('--scale', current);
 }
 
 function toggleHighContrast() {
@@ -77,7 +79,7 @@ function showScreen(screenName) {
     const error = document.getElementById(`${prefix}-error`);
     if (error) {
       error.hidden = true;
-      error.textContent = '';
+      setErrorText(error, '');
     }
   });
 
@@ -114,9 +116,10 @@ const API_BASE = (window.location.protocol === 'file:' || (window.location.port 
   : '';
 
 function updateHomeGreeting() {
+  // New HTML: <p class="greeting" id="home-greeting">Good morning, Friend.</p>
+  //           <p class="soft" id="home-date">Saturday, 19 September</p>
   const greetingEl = document.getElementById('home-greeting');
   const dateEl = document.getElementById('home-date');
-  const userGreetingEl = document.getElementById('home-user-name');
 
   const now = new Date();
   const hours = now.getHours();
@@ -125,24 +128,33 @@ function updateHomeGreeting() {
   else if (hours < 17) timeGreeting = 'Good afternoon';
   else timeGreeting = 'Good evening';
 
+  const displayName = formatDisplayName(currentUser);
+
+  // Short date: "Saturday, 19 September" — matches the wireframe exactly
   const dateStr = now.toLocaleDateString(undefined, {
     weekday: 'long',
-    month: 'long',
     day: 'numeric',
-    year: 'numeric'
+    month: 'long'
   });
 
-  if (greetingEl) greetingEl.textContent = timeGreeting;
-  if (dateEl) dateEl.textContent = `Today is ${dateStr}.`;
-  if (userGreetingEl) userGreetingEl.textContent = `${formatDisplayName(currentUser)}!`;
+  if (greetingEl) greetingEl.textContent = `${timeGreeting}, ${displayName}.`;
+  if (dateEl) dateEl.textContent = dateStr;
 }
 
 // 3. Authentication
+// Small helper: the porcelain .error div contains an icon + <span> for text
+function setErrorText(el, text) {
+  if (!el) return;
+  const span = el.querySelector('span');
+  if (span) span.textContent = text;
+  else el.textContent = text;
+}
+
 async function handleLogin(username, password) {
   const errorEl = document.getElementById('login-error');
   if (errorEl) {
     errorEl.hidden = true;
-    errorEl.textContent = '';
+    setErrorText(errorEl, '');
   }
 
   try {
@@ -157,7 +169,7 @@ async function handleLogin(username, password) {
 
     if (!res.ok) {
       if (errorEl) {
-        errorEl.textContent = data.error || 'That did not match. Please try again.';
+        setErrorText(errorEl, data.error || 'That did not match. Please try again.');
         errorEl.hidden = false;
       }
       return;
@@ -172,9 +184,9 @@ async function handleLogin(username, password) {
   } catch (err) {
     if (errorEl) {
       if (window.location.protocol === 'file:') {
-        errorEl.innerHTML = 'You opened this file directly from your computer folder. Please type <strong>http://localhost:3000</strong> in your browser address bar to connect to the server.';
+        setErrorText(errorEl, 'You opened this file directly. Please type http://localhost:3000 in your address bar.');
       } else {
-        errorEl.textContent = 'Could not connect to the server. Please check your connection and try again.';
+        setErrorText(errorEl, 'Could not connect to the server. Please check your connection and try again.');
       }
       errorEl.hidden = false;
     }
@@ -218,7 +230,7 @@ async function callAiApi(payload) {
     showScreen('login');
     const loginErr = document.getElementById('login-error');
     if (loginErr) {
-      loginErr.textContent = 'Your session has expired. Please log in again to continue.';
+      setErrorText(loginErr, 'Your session has expired. Please log in again to continue.');
       loginErr.hidden = false;
     }
     throw new Error('Please log in again.');
@@ -254,7 +266,7 @@ async function callAiApiStream(payload, onChunk) {
     showScreen('login');
     const loginErr = document.getElementById('login-error');
     if (loginErr) {
-      loginErr.textContent = 'Your session has expired. Please log in again to continue.';
+      setErrorText(loginErr, 'Your session has expired. Please log in again to continue.');
       loginErr.hidden = false;
     }
     throw new Error('Please log in again.');
@@ -338,7 +350,7 @@ async function runExplain() {
     resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (err) {
     loadingEl.hidden = true;
-    errorEl.textContent = err.message;
+    setErrorText(errorEl, err.message);
     errorEl.hidden = false;
   } finally {
     if (btn) btn.disabled = false;
@@ -371,20 +383,24 @@ async function runScamCheck() {
     const data = await callAiApi({ feature: 'scam', text });
     loadingEl.hidden = true;
 
-    // Set Verdict Badge
-    badgeEl.className = 'scam-badge';
+    // Set Verdict Badge using porcelain .verdict classes
+    badgeEl.className = 'verdict';
     let iconSvg = '';
+    let verdictText = data.verdict;
     if (data.verdict === 'Looks Safe') {
-      badgeEl.classList.add('verdict-safe');
-      iconSvg = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>`;
+      badgeEl.classList.add('safe');
+      iconSvg = `<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>`;
+      verdictText = 'Looks safe';
     } else if (data.verdict === 'Be Careful') {
-      badgeEl.classList.add('verdict-careful');
-      iconSvg = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+      badgeEl.classList.add('careful');
+      iconSvg = `<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+      verdictText = 'Be careful';
     } else {
-      badgeEl.classList.add('verdict-scam');
-      iconSvg = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+      badgeEl.classList.add('scam');
+      iconSvg = `<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+      verdictText = 'Likely a scam';
     }
-    badgeEl.innerHTML = `${iconSvg} <span>Verdict: ${data.verdict}</span>`;
+    badgeEl.innerHTML = `${iconSvg} ${verdictText}`;
 
     // Populate Reasons
     reasonsListEl.innerHTML = '';
@@ -401,7 +417,7 @@ async function runScamCheck() {
     resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (err) {
     loadingEl.hidden = true;
-    errorEl.textContent = err.message;
+    setErrorText(errorEl, err.message);
     errorEl.hidden = false;
   } finally {
     if (btn) btn.disabled = false;
@@ -410,7 +426,7 @@ async function runScamCheck() {
 
 // 7. Feature 3: Step-by-Step Help
 async function runStepsHelp() {
-  const btn = document.getElementById('btn-steps');
+  const btn = document.getElementById('btn-run-steps');
   const inputEl = document.getElementById('steps-input');
   const viewerEl = document.getElementById('steps-viewer');
   const loadingEl = document.getElementById('steps-loading');
@@ -437,7 +453,7 @@ async function runStepsHelp() {
     viewerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (err) {
     loadingEl.hidden = true;
-    errorEl.textContent = err.message;
+    setErrorText(errorEl, err.message);
     errorEl.hidden = false;
   } finally {
     if (btn) btn.disabled = false;
@@ -453,21 +469,27 @@ function renderCurrentStep() {
   document.getElementById('steps-title').textContent = currentSteps.title;
   document.getElementById('step-indicator').textContent = `Step ${currentStepIndex + 1} of ${total}`;
   document.getElementById('step-instruction').textContent = step.instruction;
-  
+
+  // Porcelain: 6px progress bar (width as %)
+  const progressBar = document.getElementById('step-progress-bar');
+  if (progressBar) {
+    const pct = Math.round(((currentStepIndex + 1) / total) * 100);
+    progressBar.style.width = `${pct}%`;
+  }
+
   const tipEl = document.getElementById('step-tip');
   if (step.tip) {
-    tipEl.textContent = `Tip: ${step.tip}`;
+    tipEl.textContent = step.tip;
     tipEl.hidden = false;
   } else {
     tipEl.hidden = true;
   }
 
-  // Manage Nav Buttons
+  // Manage nav buttons
   const prevBtn = document.getElementById('btn-prev-step');
   const nextBtn = document.getElementById('btn-next-step');
-
   prevBtn.disabled = (currentStepIndex === 0);
-  nextBtn.textContent = (currentStepIndex === total - 1) ? 'Finished! All Done' : 'Next Step →';
+  nextBtn.textContent = (currentStepIndex === total - 1) ? 'Finish' : 'Next';
 }
 
 function stepNavigate(delta) {
@@ -488,25 +510,21 @@ function renderRemindersList() {
 
   container.innerHTML = '';
   if (items.length === 0) {
-    container.innerHTML = '<p class="sub-greeting">You have no reminders set yet. Click "Add a Reminder" below to create one!</p>';
+    container.innerHTML = '<p class="empty-state">No reminders yet. Add your first one below.</p>';
     return;
   }
 
   items.forEach(item => {
-    const row = document.createElement('div');
-    row.className = 'reminder-item';
-    row.innerHTML = `
-      <div class="reminder-content">
-        <span class="reminder-time">${escapeHtml(item.time)}</span>
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="reminder-time">${escapeHtml(item.time)}</span>
+      <span class="reminder-info">
         <span class="reminder-title">${escapeHtml(item.title)}</span>
-        ${item.note ? `<span style="color: var(--text-muted); font-size: 0.9em;">${escapeHtml(item.note)}</span>` : ''}
-      </div>
-      <button class="btn-tool btn-danger" aria-label="Delete reminder ${escapeHtml(item.title)}" onclick="removeReminder('${item.id}')">
-        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-        <span>Delete</span>
-      </button>
+        ${item.note ? `<br><span class="reminder-note">${escapeHtml(item.note)}</span>` : ''}
+      </span>
+      <button class="reminder-del" aria-label="Delete reminder: ${escapeHtml(item.title)}" onclick="removeReminder('${item.id}')">Delete</button>
     `;
-    container.appendChild(row);
+    container.appendChild(li);
   });
 }
 
@@ -533,7 +551,7 @@ function addNewReminder() {
 }
 
 async function runDailyBriefing() {
-  const btn = document.getElementById('btn-refresh-briefing');
+  const btn = document.getElementById('btn-run-briefing');
   const resultContainer = document.getElementById('myday-briefing-result');
   const contentEl = document.getElementById('myday-briefing-content');
   const loadingEl = document.getElementById('myday-loading');
@@ -566,7 +584,7 @@ async function runDailyBriefing() {
     resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (err) {
     loadingEl.hidden = true;
-    errorEl.textContent = err.message;
+    setErrorText(errorEl, err.message);
     errorEl.hidden = false;
   } finally {
     if (btn) btn.disabled = false;
@@ -608,7 +626,7 @@ async function sendChatMessage() {
       loadingEl.hidden = true;
       if (!modelBubble) {
         modelBubble = document.createElement('div');
-        modelBubble.className = 'chat-bubble chat-bubble-model';
+        modelBubble.className = 'bubble assistant';
         modelTextNode = document.createTextNode(accumulated);
         modelBubble.appendChild(modelTextNode);
         windowEl.appendChild(modelBubble);
@@ -630,7 +648,7 @@ async function sendChatMessage() {
   } catch (err) {
     loadingEl.hidden = true;
     if (modelBubble) modelBubble.remove();
-    errorEl.textContent = err.message;
+    setErrorText(errorEl, err.message);
     errorEl.hidden = false;
   } finally {
     if (btn) btn.disabled = false;
@@ -644,19 +662,26 @@ async function sendChatMessage() {
 function appendChatBubble(role, content) {
   const windowEl = document.getElementById('chat-window');
   const bubble = document.createElement('div');
-  bubble.className = `chat-bubble chat-bubble-${role}`;
+  // Porcelain classes: bubble + bubble.user or bubble.assistant
+  if (role === 'user') {
+    bubble.className = 'bubble user';
+  } else {
+    bubble.className = 'bubble assistant';
+  }
   bubble.textContent = content;
 
   if (role === 'model') {
     // Add read-aloud button to assistant messages
     const speakBtn = document.createElement('button');
-    speakBtn.className = 'btn-tool';
-    speakBtn.style.marginTop = '10px';
-    speakBtn.style.padding = '4px 10px';
-    speakBtn.style.minHeight = '38px';
+    speakBtn.className = 'btn secondary';
+    speakBtn.style.marginTop = 'var(--s1)';
+    speakBtn.style.width = 'auto';
+    speakBtn.style.padding = '0 var(--s2)';
+    speakBtn.style.minHeight = '44px';
+    speakBtn.style.fontSize = '1rem';
     speakBtn.innerHTML = `
-      <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-      <span>Read Aloud</span>
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+      Read aloud
     `;
     speakBtn.onclick = () => window.CompanionSpeech.speakText(content);
     bubble.appendChild(speakBtn);
@@ -739,6 +764,28 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       sendChatMessage();
     }
+  });
+
+  // Chat Prompt Topic Suggestions
+  window.quickSendChat = function(topicText) {
+    const input = document.getElementById('chat-input');
+    if (input) {
+      input.value = topicText;
+      sendChatMessage();
+    }
+  };
+
+  document.getElementById('chip-chat-1')?.addEventListener('click', () => {
+    window.quickSendChat('What are some beautiful, peaceful thoughts or gentle reflections for this morning?');
+  });
+  document.getElementById('chip-chat-2')?.addEventListener('click', () => {
+    window.quickSendChat('Tell me an uplifting, gentle joke to make me smile today.');
+  });
+  document.getElementById('chip-chat-3')?.addEventListener('click', () => {
+    window.quickSendChat('Please tell me a short, cozy, heartwarming story about friendship.');
+  });
+  document.getElementById('chip-chat-4')?.addEventListener('click', () => {
+    window.quickSendChat('What are some cozy herbal teas and relaxing afternoon treats?');
   });
 
   // Read Aloud Buttons
