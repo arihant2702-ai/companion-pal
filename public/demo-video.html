@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CompanionPal — 10-Second Video Demo</title>
+  <title>CompanionPal — 10-Second HD Cinematic Demo Video</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,800;1,9..144,700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #FAF8F5;
       --card-bg: #FFFFFF;
       --text-main: #23201C;
-      --text-muted: #5C554E;
+      --text-muted: #665E55;
       --primary: #184D45;
       --primary-hover: #113832;
       --accent-warm: #D96B43;
@@ -35,12 +35,12 @@
 
     .demo-wrapper {
       width: 100%;
-      max-width: 960px;
+      max-width: 1040px;
       background: var(--card-bg);
       border: 1.5px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.07);
     }
 
     .header-bar {
@@ -52,7 +52,7 @@
 
     h1 {
       font-family: 'Fraunces', serif;
-      font-size: 26px;
+      font-size: 28px;
       color: var(--primary);
     }
 
@@ -64,7 +64,7 @@
       color: var(--primary);
       padding: 6px 14px;
       border-radius: 999px;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 14px;
     }
 
@@ -72,10 +72,10 @@
       position: relative;
       width: 100%;
       padding-top: 56.25%; /* 16:9 Aspect Ratio */
-      background: #111;
-      border-radius: 14px;
+      background: #000;
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     }
 
     canvas {
@@ -90,10 +90,10 @@
     .controls-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 14px;
       align-items: center;
       justify-content: space-between;
-      margin-top: 20px;
+      margin-top: 24px;
     }
 
     .btn {
@@ -102,8 +102,8 @@
       gap: 8px;
       font-size: 16px;
       font-weight: 700;
-      padding: 12px 24px;
-      border-radius: 12px;
+      padding: 14px 28px;
+      border-radius: 14px;
       border: none;
       cursor: pointer;
       transition: all 0.2s;
@@ -118,54 +118,55 @@
     }
 
     .btn-secondary {
-      background: #E8E2D9;
+      background: #F4EFEA;
       color: var(--text-main);
+      border: 1px solid var(--border);
     }
     .btn-secondary:hover {
-      background: #DBD3C7;
+      background: #E8E2D9;
     }
 
     .timeline-container {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       flex: 1;
-      min-width: 240px;
+      min-width: 260px;
     }
 
     .progress-bar-bg {
       flex: 1;
-      height: 8px;
+      height: 10px;
       background: #E8E2D9;
-      border-radius: 4px;
+      border-radius: 5px;
       overflow: hidden;
     }
 
     .progress-bar-fill {
       width: 0%;
       height: 100%;
-      background: var(--accent-warm);
+      background: linear-gradient(90deg, var(--primary), var(--accent-warm));
       transition: width 0.05s linear;
     }
 
     .time-label {
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 800;
       color: var(--text-muted);
-      width: 50px;
+      width: 55px;
       text-align: right;
     }
 
     .scene-indicators {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 16px;
+      gap: 12px;
+      margin-top: 18px;
     }
 
     .scene-pill {
-      padding: 10px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 12px;
       background: #F4EFEA;
       font-size: 13px;
       font-weight: 700;
@@ -177,6 +178,8 @@
     .scene-pill.active {
       background: var(--primary);
       color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(24, 77, 69, 0.25);
     }
   </style>
 </head>
@@ -185,28 +188,28 @@
   <div class="demo-wrapper">
     <div class="header-bar">
       <div>
-        <h1>CompanionPal: 10-Second Project Demo</h1>
-        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">High-Definition 16:9 Showcase of Accessible Senior Care GenAI</p>
+        <h1>CompanionPal: 10-Second HD Video Showcase</h1>
+        <p style="color: var(--text-muted); font-size: 15px; margin-top: 4px;">Cinematic 1080p demo with ambient audio and Ken-Burns motion</p>
       </div>
-      <span class="badge">10.0s HD Demo</span>
+      <span class="badge">1080p HD • 10.0s</span>
     </div>
 
     <div class="video-canvas-container">
-      <canvas id="demoCanvas" width="1280" height="720"></canvas>
+      <canvas id="demoCanvas" width="1920" height="1080"></canvas>
     </div>
 
     <div class="scene-indicators">
-      <div class="scene-pill" id="pill-0">01. Overview (0–2.5s)</div>
+      <div class="scene-pill" id="pill-0">01. Senior Independence (0–2.5s)</div>
       <div class="scene-pill" id="pill-1">02. Explain This (2.5–5s)</div>
       <div class="scene-pill" id="pill-2">03. Scam Shield (5–7.5s)</div>
-      <div class="scene-pill" id="pill-3">04. Accessibility (7.5–10s)</div>
+      <div class="scene-pill" id="pill-3">04. Confidence & Speed (7.5–10s)</div>
     </div>
 
     <div class="controls-bar">
       <div class="timeline-container">
         <button id="btnPlay" class="btn btn-primary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span id="playText">Play Demo</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="playText">Play HD Demo</span>
         </button>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" id="progressFill"></div>
@@ -215,12 +218,12 @@
       </div>
 
       <button id="btnDownload" class="btn btn-secondary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span>Download Video (.webm)</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Download Video File</span>
       </button>
 
       <a href="/" class="btn btn-secondary" style="text-decoration: none;">
-        <span>← Back to App</span>
+        <span>← Open CompanionPal</span>
       </a>
     </div>
   </div>
@@ -240,7 +243,7 @@
       document.getElementById('pill-3')
     ];
 
-    const TOTAL_DURATION = 10.0; // exactly 10.0 seconds
+    const TOTAL_DURATION = 10.0; // 10.0s exact length
     let startTime = null;
     let isPlaying = false;
     let animationFrameId = null;
@@ -248,14 +251,65 @@
     let recordedChunks = [];
     let isRecording = false;
 
-    // Preload Hero Image
-    const heroImg = new Image();
-    heroImg.src = '/images/demo_hero.jpg';
-    let heroLoaded = false;
-    heroImg.onload = () => {
-      heroLoaded = true;
-      renderFrame(0);
-    };
+    // Web Audio Soundtrack Synthesizer
+    let audioCtx = null;
+    let audioDest = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+        audioDest = audioCtx.createMediaStreamDestination();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playChord(freqs, startSec, durationSec) {
+      if (!audioCtx) return;
+      freqs.forEach(freq => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + startSec);
+
+        gain.gain.setValueAtTime(0, audioCtx.currentTime + startSec);
+        gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + startSec + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + startSec + durationSec);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        if (audioDest) gain.connect(audioDest);
+
+        osc.start(audioCtx.currentTime + startSec);
+        osc.stop(audioCtx.currentTime + startSec + durationSec);
+      });
+    }
+
+    function startSoundtrack() {
+      initAudio();
+      // Warm chord progression across 10 seconds (C -> G -> Am -> F)
+      playChord([261.63, 329.63, 392.00, 523.25], 0.0, 2.5); // C Major
+      playChord([196.00, 246.94, 293.66, 392.00], 2.5, 2.5); // G Major
+      playChord([220.00, 261.63, 329.63, 440.00], 5.0, 2.5); // A Minor
+      playChord([174.61, 220.00, 261.63, 349.23, 523.25], 7.5, 2.5); // F Major
+    }
+
+    // Preload 4 Cinematic HD Scenes
+    const sceneImages = [new Image(), new Image(), new Image(), new Image()];
+    const sceneSources = ['/images/scene1.jpg', '/images/scene2.jpg', '/images/scene3.jpg', '/images/scene4.jpg'];
+    let loadedCount = 0;
+
+    sceneImages.forEach((img, idx) => {
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === 4) {
+          renderFrame(0);
+        }
+      };
+      img.src = sceneSources[idx];
+    });
 
     function updatePills(sceneIdx) {
       pills.forEach((p, idx) => {
@@ -263,244 +317,261 @@
       });
     }
 
+    // Draw an image with cinematic Ken Burns slow zoom & pan
+    function drawKenBurns(img, progress, targetAlpha = 1) {
+      const w = 1920;
+      const h = 1080;
+      ctx.save();
+      ctx.globalAlpha = targetAlpha;
+
+      const scale = 1.0 + (progress * 0.08); // 8% gentle zoom
+      const panX = -progress * 40;
+      const panY = -progress * 20;
+
+      const drawW = w * scale;
+      const drawH = h * scale;
+      const offsetX = (w - drawW) / 2 + panX;
+      const offsetY = (h - drawH) / 2 + panY;
+
+      ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+      ctx.restore();
+    }
+
     function renderFrame(timeSec) {
-      const w = 1280;
-      const h = 720;
+      const w = 1920;
+      const h = 1080;
       ctx.clearRect(0, 0, w, h);
 
-      // Scene 1: 0.0s - 2.5s (The Living Room Problem & Product Intro)
-      if (timeSec < 2.5) {
-        updatePills(0);
-        const progress = timeSec / 2.5;
+      // Determine active scene (0, 1, 2, or 3)
+      let sceneIdx = Math.min(3, Math.floor(timeSec / 2.5));
+      updatePills(sceneIdx);
 
-        // Background Warm Hero
-        if (heroLoaded) {
-          ctx.drawImage(heroImg, 0, 0, w, h);
-          // Dark gentle gradient overlay
-          const grad = ctx.createLinearGradient(0, 0, w, 0);
-          grad.addColorStop(0, 'rgba(24, 77, 69, 0.92)');
-          grad.addColorStop(0.55, 'rgba(24, 77, 69, 0.85)');
-          grad.addColorStop(1, 'rgba(24, 77, 69, 0.4)');
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, w, h);
-        } else {
-          ctx.fillStyle = '#184D45';
-          ctx.fillRect(0, 0, w, h);
-        }
+      const sceneLocalTime = timeSec - (sceneIdx * 2.5);
+      const sceneProgress = sceneLocalTime / 2.5;
 
-        // Title Elements
-        ctx.fillStyle = '#FAF8F5';
-        ctx.font = '800 68px Fraunces, Georgia, serif';
-        ctx.fillText('CompanionPal', 80, 240);
-
-        ctx.fillStyle = '#E8C547';
-        ctx.font = '700 32px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Your Caring Daily AI Companion for Seniors', 80, 310);
-
-        // Feature list cards
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.roundRect(80, 370, 720, 180, 16);
-        ctx.fill();
-
-        ctx.fillStyle = '#FAF8F5';
-        ctx.font = '600 24px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('• Large 56px touch buttons & AAA contrast', 110, 425);
-        ctx.fillText('• 100% live Google Gemini with 2-second speed', 110, 470);
-        ctx.fillText('• Voice-in dictation & calm read-aloud', 110, 515);
-
-        // Bottom Brand badge
-        ctx.fillStyle = '#E8C547';
-        ctx.font = '800 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('DESIGNED FOR PATIENCE, INDEPENDENCE & WARMTH', 80, 620);
+      // Handle Crossfade Transition in the first 0.4s of a scene
+      const crossfadeDuration = 0.4;
+      if (sceneLocalTime < crossfadeDuration && sceneIdx > 0) {
+        const prevImg = sceneImages[sceneIdx - 1];
+        drawKenBurns(prevImg, 1.0, 1);
+        const currAlpha = sceneLocalTime / crossfadeDuration;
+        drawKenBurns(sceneImages[sceneIdx], sceneProgress, currAlpha);
+      } else {
+        drawKenBurns(sceneImages[sceneIdx], sceneProgress, 1);
       }
 
-      // Scene 2: 2.5s - 5.0s (Feature 1: Explain This)
-      else if (timeSec < 5.0) {
-        updatePills(1);
-        ctx.fillStyle = '#FAF8F5';
+      // ==========================================
+      // SCENE 1: (0.0s – 2.5s) INTRO & LIVING ROOM
+      // ==========================================
+      if (sceneIdx === 0) {
+        // Darkened vignette on left for typography
+        const grad = ctx.createLinearGradient(0, 0, w * 0.75, 0);
+        grad.addColorStop(0, 'rgba(18, 48, 42, 0.94)');
+        grad.addColorStop(0.65, 'rgba(18, 48, 42, 0.82)');
+        grad.addColorStop(1, 'rgba(18, 48, 42, 0.0)');
+        ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
 
-        // Header
-        ctx.fillStyle = '#184D45';
-        ctx.font = '800 48px Fraunces, Georgia, serif';
-        ctx.fillText('Feature 1: "Explain This"', 80, 110);
-        ctx.fillStyle = '#5C554E';
-        ctx.font = '600 24px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Translates dense legal & medical letters into clear Grade-6 plain English', 80, 155);
-
-        // Two Cards Comparison
-        // Card Left: Confusing Notice
-        ctx.fillStyle = '#F4EFEA';
-        ctx.roundRect(80, 200, 520, 440, 16);
-        ctx.fill();
-        ctx.strokeStyle = '#E8E2D9';
+        // Glassmorphism card container
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.lineWidth = 2;
+        ctx.roundRect(100, 200, 960, 680, 24);
+        ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#8A3B14';
-        ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('CONFUSING MEDICAL NOTICE', 110, 250);
-
-        ctx.fillStyle = '#5C554E';
-        ctx.font = '500 18px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('"Pursuant to section 4B statutory stipulations,', 110, 300);
-        ctx.fillText('the recipient is hereby requested to remit', 110, 335);
-        ctx.fillText('supplemental co-pay within 14 calendar days..."', 110, 370);
-
-        // Card Right: CompanionPal Simple Summary
-        ctx.fillStyle = '#FFFFFF';
-        ctx.roundRect(640, 200, 560, 440, 16);
+        // Brand Pill
+        ctx.fillStyle = '#E8C547';
+        ctx.roundRect(140, 240, 280, 48, 24);
         ctx.fill();
-        ctx.strokeStyle = '#184D45';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
         ctx.fillStyle = '#184D45';
-        ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('COMPANIONPAL EXPLANATION (LIVE STREAMED)', 670, 250);
+        ctx.font = '800 20px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('GENAI FOR OLDER ADULTS', 165, 272);
 
-        ctx.fillStyle = '#23201C';
-        ctx.font = '700 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('1. What This Says:', 670, 300);
-        ctx.font = '500 18px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('The clinic needs a small $20 visit payment.', 700, 335);
+        // Title
+        ctx.fillStyle = '#FAF8F5';
+        ctx.font = '800 96px Fraunces, Georgia, serif';
+        ctx.fillText('CompanionPal', 140, 390);
 
-        ctx.font = '700 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('2. What To Do Next:', 670, 385);
-        ctx.font = '500 18px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Bring $20 or your card to your next appointment.', 700, 420);
+        ctx.fillStyle = '#E8C547';
+        ctx.font = '700 36px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('A Caring, Trustworthy Daily AI Companion', 140, 460);
 
-        ctx.font = '700 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('3. Important Deadline:', 670, 470);
-        ctx.font = '500 18px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Payment due on Friday, April 4th.', 700, 505);
+        // Bullets
+        ctx.fillStyle = '#FAF8F5';
+        ctx.font = '600 28px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('✓  Built for seniors: Grade-6 reading, calm & patient', 140, 560);
+        ctx.fillText('✓  Accessible: 56px touch targets, A+ text & speech', 140, 630);
+        ctx.fillText('✓  Live Gemini Intelligence: 20x faster response time', 140, 700);
 
-        // Read aloud icon
-        ctx.fillStyle = '#184D45';
-        ctx.roundRect(670, 550, 190, 50, 10);
+        // Trust badge
+        ctx.fillStyle = 'rgba(232, 197, 71, 0.2)';
+        ctx.roundRect(140, 760, 520, 64, 16);
         ctx.fill();
-        ctx.fillStyle = '#FFF';
-        ctx.font = '700 18px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('🔊 Read Aloud', 700, 582);
+        ctx.fillStyle = '#E8C547';
+        ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('WCAG AAA Accessible • Zero Tech Jargon', 170, 800);
       }
 
-      // Scene 3: 5.0s - 7.5s (Feature 2: Is This a Scam?)
-      else if (timeSec < 7.5) {
-        updatePills(2);
-        ctx.fillStyle = '#FAF8F5';
+      // ==========================================
+      // SCENE 2: (2.5s – 5.0s) EXPLAIN THIS
+      // ==========================================
+      else if (sceneIdx === 1) {
+        // Gradient overlay at bottom & right
+        const grad = ctx.createLinearGradient(0, h * 0.45, 0, h);
+        grad.addColorStop(0, 'rgba(24, 77, 69, 0.0)');
+        grad.addColorStop(1, 'rgba(24, 77, 69, 0.95)');
+        ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
 
-        ctx.fillStyle = '#184D45';
-        ctx.font = '800 48px Fraunces, Georgia, serif';
-        ctx.fillText('Feature 2: "Is This a Scam?"', 80, 110);
-        ctx.fillStyle = '#5C554E';
-        ctx.font = '600 24px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Protecting seniors from phone, SMS, and power-cut fraud', 80, 155);
-
-        // Scam SMS Card
-        ctx.fillStyle = '#FFFFFF';
-        ctx.roundRect(80, 200, 480, 440, 16);
-        ctx.fill();
-        ctx.strokeStyle = '#E8E2D9';
+        // Glass banner at bottom
+        ctx.fillStyle = 'rgba(18, 48, 42, 0.88)';
+        ctx.strokeStyle = 'rgba(232, 197, 71, 0.4)';
         ctx.lineWidth = 2;
+        ctx.roundRect(100, 640, 1720, 360, 24);
+        ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#5C554E';
-        ctx.font = '800 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('SUSPICIOUS SMS RECEIVED', 110, 250);
-
-        ctx.fillStyle = '#23201C';
-        ctx.font = '500 19px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('"Electricity power will be cut tonight at', 110, 305);
-        ctx.fillText('9:30 PM due to unpaid bill. Call officer', 110, 340);
-        ctx.fillText('at 9876543210 immediately to pay."', 110, 375);
-
-        // Verdict Shield Card
-        ctx.fillStyle = '#FFF3EE';
-        ctx.roundRect(600, 200, 600, 440, 16);
+        // Badge
+        ctx.fillStyle = '#E8C547';
+        ctx.roundRect(140, 680, 260, 44, 22);
         ctx.fill();
+        ctx.fillStyle = '#184D45';
+        ctx.font = '800 20px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('FEATURE 1: EXPLAIN THIS', 160, 710);
+
+        // Heading
+        ctx.fillStyle = '#FAF8F5';
+        ctx.font = '800 52px Fraunces, Georgia, serif';
+        ctx.fillText('Translates Confusing Letters into Simple, Calming English', 140, 785);
+
+        // Sub details
+        ctx.fillStyle = '#FAF8F5';
+        ctx.font = '600 26px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('• 3 Clean Sections: What This Says, What To Do Next, Important Deadlines', 140, 845);
+        ctx.fillText('• Real-time SSE live streaming & one-touch 🔊 Read Aloud at a relaxed pace', 140, 895);
+
+        // Floating Tag
+        ctx.fillStyle = '#E8C547';
+        ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Instant Grade-6 Clarity →', 1400, 895);
+      }
+
+      // ==========================================
+      // SCENE 3: (5.0s – 7.5s) IS THIS A SCAM?
+      // ==========================================
+      else if (sceneIdx === 2) {
+        // Vignette
+        const grad = ctx.createLinearGradient(0, h * 0.45, 0, h);
+        grad.addColorStop(0, 'rgba(163, 51, 29, 0.0)');
+        grad.addColorStop(1, 'rgba(24, 77, 69, 0.96)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Bottom card
+        ctx.fillStyle = 'rgba(18, 48, 42, 0.90)';
         ctx.strokeStyle = '#D96B43';
         ctx.lineWidth = 3;
+        ctx.roundRect(100, 640, 1720, 360, 24);
+        ctx.fill();
         ctx.stroke();
 
-        // Verdict Badge
-        ctx.fillStyle = '#A3331D';
-        ctx.roundRect(630, 230, 260, 54, 27);
+        // Warning Badge
+        ctx.fillStyle = '#D96B43';
+        ctx.roundRect(140, 680, 320, 48, 24);
         ctx.fill();
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('⚠ Verdict: Likely Scam', 655, 265);
+        ctx.fillText('⚠ FEATURE 2: SCAM SHIELD', 165, 712);
 
-        ctx.fillStyle = '#23201C';
-        ctx.font = '700 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Why this message is dangerous:', 630, 330);
+        // Heading
+        ctx.fillStyle = '#FAF8F5';
+        ctx.font = '800 52px Fraunces, Georgia, serif';
+        ctx.fillText('Protects Older Adults from Phone, SMS, and KYC Scams', 140, 785);
 
-        ctx.font = '500 18px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('• Electricity boards never threaten instant cuts over text.', 650, 370);
-        ctx.fillText('• Scammers use personal mobile numbers, not utility systems.', 650, 410);
+        // Reasons
+        ctx.fillStyle = '#FAF8F5';
+        ctx.font = '600 26px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('• Evaluates electricity cutoff threats, fake bank KYC, and Medicare scams', 140, 845);
+        ctx.fillText('• Delivers verified color-coded verdicts with concrete safe actions to take right now', 140, 895);
 
-        ctx.fillStyle = '#184D45';
-        ctx.font = '700 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Safe Action Recommended:', 630, 470);
-        ctx.font = '500 18px "Plus Jakarta Sans", sans-serif';
-        ctx.fillStyle = '#23201C';
-        ctx.fillText('Delete this text right now. Do not call the number.', 650, 510);
+        // Safe Action Tag
+        ctx.fillStyle = '#E8C547';
+        ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Peace of Mind Guaranteed →', 1350, 895);
       }
 
-      // Scene 4: 7.5s - 10.0s (Accessibility, Speed & Independence)
+      // ==========================================
+      // SCENE 4: (7.5s – 10.0s) CONFIDENCE & SPEED
+      // ==========================================
       else {
-        updatePills(3);
-        ctx.fillStyle = '#184D45';
+        // Darkening gradient for crisp typography
+        ctx.fillStyle = 'rgba(18, 48, 42, 0.75)';
         ctx.fillRect(0, 0, w, h);
 
-        ctx.fillStyle = '#E8C547';
-        ctx.font = '800 32px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('ACCESSIBLE • FAST • TRUSTWORTHY', w/2, 160);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.strokeStyle = 'rgba(232, 197, 71, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.roundRect(160, 140, 1600, 800, 32);
+        ctx.fill();
+        ctx.stroke();
+
         ctx.textAlign = 'center';
 
+        // Badge
+        ctx.fillStyle = '#E8C547';
+        ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('ACCESSIBLE • ULTRA-FAST • TRUSTWORTHY', w / 2, 220);
+
+        // Main Title
         ctx.fillStyle = '#FAF8F5';
-        ctx.font = '800 64px Fraunces, Georgia, serif';
-        ctx.fillText('CompanionPal', w/2, 250);
+        ctx.font = '800 84px Fraunces, Georgia, serif';
+        ctx.fillText('CompanionPal', w / 2, 330);
 
-        ctx.font = '600 28px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Empowering Seniors with Confidence & Independence', w/2, 320);
+        ctx.fillStyle = '#FAF8F5';
+        ctx.font = '600 36px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Empowering Seniors with Confidence and Independence', w / 2, 410);
 
-        // 3 Feature Badges
-        const badges = [
-          { title: 'Grade-6 Simple Words', sub: 'Zero confusing jargon' },
-          { title: '2-Second AI Speed', sub: 'Live streaming answers' },
-          { title: 'A+ Text & Voice', sub: 'Dictate & listen easily' }
+        // 3 Feature Cards
+        const pillars = [
+          { title: 'Grade-6 Language', desc: 'No tech jargon, simple sentences' },
+          { title: '2-Second Response', desc: 'Live Gemini streaming generation' },
+          { title: 'Voice & Large Touch', desc: '56px touch targets & voice dictation' }
         ];
 
-        badges.forEach((b, i) => {
-          const bx = 160 + i * 330;
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-          ctx.roundRect(bx, 380, 300, 150, 16);
+        pillars.forEach((p, i) => {
+          const px = 240 + i * 490;
+          ctx.fillStyle = 'rgba(24, 77, 69, 0.85)';
+          ctx.strokeStyle = 'rgba(232, 197, 71, 0.3)';
+          ctx.lineWidth = 2;
+          ctx.roundRect(px, 480, 450, 190, 20);
           ctx.fill();
+          ctx.stroke();
 
           ctx.fillStyle = '#E8C547';
-          ctx.font = '800 22px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText(b.title, bx + 150, 435);
+          ctx.font = '800 28px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText(p.title, px + 225, 550);
 
           ctx.fillStyle = '#FAF8F5';
-          ctx.font = '500 18px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText(b.sub, bx + 150, 480);
+          ctx.font = '500 22px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText(p.desc, px + 225, 605);
         });
 
-        // Footer URL
-        ctx.fillStyle = '#FAF8F5';
-        ctx.font = '700 22px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Try CompanionPal: localhost:3000', w/2, 620);
+        // CTA Footer
+        ctx.fillStyle = '#E8C547';
+        ctx.font = '800 32px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Live on localhost:3000 & Vercel', w / 2, 780);
+
         ctx.textAlign = 'left'; // reset
       }
 
-      // Watermark / Clock
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-      ctx.roundRect(w - 140, 20, 120, 38, 8);
+      // Top-Right Video Timecode Overlay
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.roundRect(w - 240, 40, 190, 54, 12);
       ctx.fill();
-      ctx.fillStyle = '#FFF';
-      ctx.font = '700 16px monospace';
-      ctx.fillText(`${timeSec.toFixed(1)}s / 10.0s`, w - 130, 45);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '800 24px monospace';
+      ctx.fillText(`${timeSec.toFixed(1)}s / 10.0s`, w - 215, 76);
     }
 
     function step(timestamp) {
@@ -524,7 +595,8 @@
     function startPlayback() {
       isPlaying = true;
       startTime = null;
-      playText.textContent = 'Replay';
+      playText.textContent = 'Replay HD Demo';
+      startSoundtrack();
       animationFrameId = requestAnimationFrame(step);
     }
 
@@ -540,18 +612,36 @@
       startPlayback();
     });
 
-    // Recording & Downloading Video
+    // Recording & Downloading 1080p Video File
     btnDownload.addEventListener('click', () => {
       btnDownload.disabled = true;
-      btnDownload.textContent = 'Recording 10s video...';
+      btnDownload.textContent = 'Recording 10s 1080p Video...';
 
+      initAudio();
       recordedChunks = [];
-      const stream = canvas.captureStream(30); // 30 FPS
+
+      // Capture 60fps canvas stream
+      const canvasStream = canvas.captureStream(60);
+
+      // Combine canvas video + synthesized audio destination stream
+      const combinedTracks = [...canvasStream.getVideoTracks()];
+      if (audioDest && audioDest.stream) {
+        const audioTracks = audioDest.stream.getAudioTracks();
+        if (audioTracks.length > 0) {
+          combinedTracks.push(audioTracks[0]);
+        }
+      }
+
+      const combinedStream = new MediaStream(combinedTracks);
+
       const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
         ? 'video/webm;codecs=vp9'
         : 'video/webm';
 
-      mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 3000000 });
+      mediaRecorder = new MediaRecorder(combinedStream, {
+        mimeType,
+        videoBitsPerSecond: 12000000 // 12 Mbps ultra-crisp bitrate
+      });
       isRecording = true;
 
       mediaRecorder.ondataavailable = (e) => {
@@ -567,15 +657,15 @@
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'companion-pal-10s-demo.webm';
+        a.download = 'companion-pal-10s-hd-demo.webm';
         document.body.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);
         a.remove();
         btnDownload.disabled = false;
         btnDownload.innerHTML = `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Download Video (.webm)</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download Video File</span>
         `;
       };
 
@@ -590,8 +680,10 @@
       }, 10200);
     });
 
-    // Initial render
-    renderFrame(0);
+    // Render first frame as soon as fonts are ready
+    document.fonts.ready.then(() => {
+      renderFrame(0);
+    });
   </script>
 </body>
 </html>
