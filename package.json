@@ -1,0 +1,20 @@
+{
+  "name": "companion-pal",
+  "version": "1.0.0",
+  "description": "An intelligent, accessible, and trustworthy GenAI daily companion for older adults.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/e2e-test.js"
+  },
+  "keywords": [
+    "accessibility",
+    "seniors",
+    "gemini",
+    "companion",
+    "wcag",
+    "screen-reader"
+  ],
+  "author": "CompanionPal Team",
+  "license": "MIT"
+}
