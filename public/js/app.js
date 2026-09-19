@@ -797,15 +797,13 @@ document.addEventListener('DOMContentLoaded', () => {
     this.textContent = isSlow ? 'Reading Pace: Slow & Gentle' : 'Reading Pace: Normal';
   });
 
-  // Check initial cached login
-  const cachedUser = localStorage.getItem('companionpal_user');
-  if (cachedUser) {
-    currentUser = cachedUser;
-    showScreen('home');
-  } else {
-    showScreen('login');
-  }
+  // Always force the Sign In screen as the first view on page load
+  currentUser = null;
+  localStorage.removeItem('companionpal_user');
+  localStorage.removeItem('companionpal_token');
+  showScreen('login');
 });
+
 
 // Demo Account Quick-Fill Helpers for Reviewers
 window.fillDemoAccount = function(username, password) {
