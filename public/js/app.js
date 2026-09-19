@@ -53,9 +53,28 @@ function toggleHighContrast() {
 }
 
 // 2. Navigation & Screen Management
+function formatDisplayName(username) {
+  if (!username) return 'Friend';
+  if (username === 'senior.demo') return 'Senior Friend';
+  if (username === 'family.demo') return 'Family Helper';
+  const clean = username.split('@')[0].split('.')[0];
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
+}
+
 function showScreen(screenName) {
   currentScreen = screenName;
   window.CompanionSpeech.stopSpeaking();
+
+  // Reset any loading boxes or error banners so they never show prematurely
+  ['login', 'explain', 'scam', 'steps', 'briefing', 'chat'].forEach(prefix => {
+    const loading = document.getElementById(`${prefix}-loading`);
+    if (loading) loading.hidden = true;
+    const error = document.getElementById(`${prefix}-error`);
+    if (error) {
+      error.hidden = true;
+      error.textContent = '';
+    }
+  });
 
   // Hide all screens
   Object.keys(views).forEach(key => {
@@ -84,6 +103,11 @@ function showScreen(screenName) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Base URL for API requests (connects to local server if opened via file:// or another port)
+const API_BASE = (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '3000' && window.location.hostname === 'localhost'))
+  ? 'http://localhost:3000'
+  : '';
+
 function updateHomeGreeting() {
   const greetingEl = document.getElementById('home-greeting');
   const dateEl = document.getElementById('home-date');
@@ -105,18 +129,22 @@ function updateHomeGreeting() {
 
   if (greetingEl) greetingEl.textContent = timeGreeting;
   if (dateEl) dateEl.textContent = `Today is ${dateStr}.`;
-  if (userGreetingEl) userGreetingEl.textContent = currentUser ? `${currentUser}!` : 'Friend!';
+  if (userGreetingEl) userGreetingEl.textContent = `${formatDisplayName(currentUser)}!`;
 }
 
 // 3. Authentication
 async function handleLogin(username, password) {
   const errorEl = document.getElementById('login-error');
-  if (errorEl) errorEl.hidden = true;
+  if (errorEl) {
+    errorEl.hidden = true;
+    errorEl.textContent = '';
+  }
 
   try {
-    const res = await fetch('/api/login', {
+    const res = await fetch(`${API_BASE}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ username, password })
     });
 
@@ -132,10 +160,17 @@ async function handleLogin(username, password) {
 
     currentUser = data.username;
     localStorage.setItem('companionpal_user', currentUser);
+    if (data.token) {
+      localStorage.setItem('companionpal_token', data.token);
+    }
     showScreen('home');
   } catch (err) {
     if (errorEl) {
-      errorEl.textContent = 'Could not connect to the server. Please check your connection and try again.';
+      if (window.location.protocol === 'file:') {
+        errorEl.innerHTML = 'You opened this file directly from your computer folder. Please type <strong>http://localhost:3000</strong> in your browser address bar to connect to the server.';
+      } else {
+        errorEl.textContent = 'Could not connect to the server. Please check your connection and try again.';
+      }
       errorEl.hidden = false;
     }
   }
@@ -143,13 +178,14 @@ async function handleLogin(username, password) {
 
 async function handleLogout() {
   try {
-    await fetch('/api/logout', { method: 'POST' });
+    await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' });
   } catch (err) {
     console.warn('Logout network error:', err);
   }
 
   currentUser = null;
   localStorage.removeItem('companionpal_user');
+  localStorage.removeItem('companionpal_token');
   chatHistory = [];
   currentSteps = null;
   showScreen('login');
@@ -157,16 +193,23 @@ async function handleLogout() {
 
 // 4. API Request Wrapper with 401 handling
 async function callAiApi(payload) {
-  const res = await fetch('/api/chat', {
+  const token = localStorage.getItem('companionpal_token');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${API_BASE}/api/chat`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
+    credentials: 'include',
     body: JSON.stringify(payload)
   });
 
   if (res.status === 401) {
-    // Session expired or unauthenticated
     currentUser = null;
     localStorage.removeItem('companionpal_user');
+    localStorage.removeItem('companionpal_token');
     showScreen('login');
     const loginErr = document.getElementById('login-error');
     if (loginErr) {
@@ -184,8 +227,82 @@ async function callAiApi(payload) {
   return data;
 }
 
+// 4b. Streaming API Request Wrapper with live chunks
+async function callAiApiStream(payload, onChunk) {
+  const token = localStorage.getItem('companionpal_token');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${API_BASE}/api/chat`, {
+    method: 'POST',
+    headers,
+    credentials: 'include',
+    body: JSON.stringify({ ...payload, stream: true })
+  });
+
+  if (res.status === 401) {
+    currentUser = null;
+    localStorage.removeItem('companionpal_user');
+    localStorage.removeItem('companionpal_token');
+    showScreen('login');
+    const loginErr = document.getElementById('login-error');
+    if (loginErr) {
+      loginErr.textContent = 'Your session has expired. Please log in again to continue.';
+      loginErr.hidden = false;
+    }
+    throw new Error('Please log in again.');
+  }
+
+  if (!res.ok) {
+    let errMsg = 'Something went wrong. Please try again.';
+    try {
+      const errData = await res.json();
+      if (errData.error) errMsg = errData.error;
+    } catch {}
+    throw new Error(errMsg);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let full = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('data: ')) {
+        try {
+          const parsed = JSON.parse(trimmed.slice(6).trim());
+          if (parsed.chunk) {
+            full += parsed.chunk;
+            if (typeof onChunk === 'function') {
+              onChunk(full);
+            }
+          } else if (parsed.done && parsed.full) {
+            full = parsed.full;
+            if (typeof onChunk === 'function') {
+              onChunk(full);
+            }
+          }
+        } catch {}
+      }
+    }
+  }
+
+  return { result: full };
+}
+
 // 5. Feature 1: Explain This
 async function runExplain() {
+  const btn = document.getElementById('btn-explain');
   const inputEl = document.getElementById('explain-input');
   const resultContainer = document.getElementById('explain-result');
   const contentEl = document.getElementById('explain-content');
@@ -201,9 +318,15 @@ async function runExplain() {
   resultContainer.hidden = true;
   errorEl.hidden = true;
   loadingEl.hidden = false;
+  if (btn) btn.disabled = true;
 
   try {
-    const data = await callAiApi({ feature: 'explain', text });
+    contentEl.textContent = '';
+    const data = await callAiApiStream({ feature: 'explain', text }, (accumulated) => {
+      loadingEl.hidden = true;
+      contentEl.textContent = accumulated;
+      resultContainer.hidden = false;
+    });
     loadingEl.hidden = true;
     contentEl.textContent = data.result;
     resultContainer.hidden = false;
@@ -212,11 +335,14 @@ async function runExplain() {
     loadingEl.hidden = true;
     errorEl.textContent = err.message;
     errorEl.hidden = false;
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
 // 6. Feature 2: Is This a Scam?
 async function runScamCheck() {
+  const btn = document.getElementById('btn-scam');
   const inputEl = document.getElementById('scam-input');
   const resultContainer = document.getElementById('scam-result');
   const badgeEl = document.getElementById('scam-badge');
@@ -234,6 +360,7 @@ async function runScamCheck() {
   resultContainer.hidden = true;
   errorEl.hidden = true;
   loadingEl.hidden = false;
+  if (btn) btn.disabled = true;
 
   try {
     const data = await callAiApi({ feature: 'scam', text });
@@ -271,11 +398,14 @@ async function runScamCheck() {
     loadingEl.hidden = true;
     errorEl.textContent = err.message;
     errorEl.hidden = false;
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
 // 7. Feature 3: Step-by-Step Help
 async function runStepsHelp() {
+  const btn = document.getElementById('btn-steps');
   const inputEl = document.getElementById('steps-input');
   const viewerEl = document.getElementById('steps-viewer');
   const loadingEl = document.getElementById('steps-loading');
@@ -290,6 +420,7 @@ async function runStepsHelp() {
   viewerEl.hidden = true;
   errorEl.hidden = true;
   loadingEl.hidden = false;
+  if (btn) btn.disabled = true;
 
   try {
     const data = await callAiApi({ feature: 'steps', text });
@@ -303,6 +434,8 @@ async function runStepsHelp() {
     loadingEl.hidden = true;
     errorEl.textContent = err.message;
     errorEl.hidden = false;
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -395,6 +528,7 @@ function addNewReminder() {
 }
 
 async function runDailyBriefing() {
+  const btn = document.getElementById('btn-refresh-briefing');
   const resultContainer = document.getElementById('myday-briefing-result');
   const contentEl = document.getElementById('myday-briefing-content');
   const loadingEl = document.getElementById('myday-loading');
@@ -406,13 +540,19 @@ async function runDailyBriefing() {
   resultContainer.hidden = true;
   errorEl.hidden = true;
   loadingEl.hidden = false;
+  if (btn) btn.disabled = true;
 
   try {
-    const data = await callAiApi({
+    contentEl.textContent = '';
+    const data = await callAiApiStream({
       feature: 'myday',
       reminders,
       currentTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       currentDate: now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    }, (accumulated) => {
+      loadingEl.hidden = true;
+      contentEl.textContent = accumulated;
+      resultContainer.hidden = false;
     });
 
     loadingEl.hidden = true;
@@ -423,11 +563,14 @@ async function runDailyBriefing() {
     loadingEl.hidden = true;
     errorEl.textContent = err.message;
     errorEl.hidden = false;
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
 // 9. Feature 5: Just Chat
 async function sendChatMessage() {
+  const btn = document.getElementById('btn-send-chat');
   const inputEl = document.getElementById('chat-input');
   const windowEl = document.getElementById('chat-window');
   const loadingEl = document.getElementById('chat-loading');
@@ -445,20 +588,48 @@ async function sendChatMessage() {
   loadingEl.hidden = false;
   windowEl.scrollTop = windowEl.scrollHeight;
 
+  if (btn) btn.disabled = true;
+  if (inputEl) inputEl.disabled = true;
+
+  let modelBubble = null;
+  let modelTextNode = null;
+
   try {
-    const data = await callAiApi({
+    const data = await callAiApiStream({
       feature: 'chat',
       text,
       history: chatHistory.slice(0, -1)
+    }, (accumulated) => {
+      loadingEl.hidden = true;
+      if (!modelBubble) {
+        modelBubble = document.createElement('div');
+        modelBubble.className = 'chat-bubble chat-bubble-model';
+        modelTextNode = document.createTextNode(accumulated);
+        modelBubble.appendChild(modelTextNode);
+        windowEl.appendChild(modelBubble);
+      } else {
+        modelTextNode.nodeValue = accumulated;
+      }
+      windowEl.scrollTop = windowEl.scrollHeight;
     });
 
     loadingEl.hidden = true;
+    if (modelBubble) {
+      modelBubble.remove();
+    }
     appendChatBubble('model', data.result);
     chatHistory.push({ role: 'model', content: data.result });
   } catch (err) {
     loadingEl.hidden = true;
+    if (modelBubble) modelBubble.remove();
     errorEl.textContent = err.message;
     errorEl.hidden = false;
+  } finally {
+    if (btn) btn.disabled = false;
+    if (inputEl) {
+      inputEl.disabled = false;
+      inputEl.focus();
+    }
   }
 }
 

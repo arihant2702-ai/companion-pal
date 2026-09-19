@@ -114,7 +114,16 @@ function getAuthenticatedUser(req) {
     if (key) cookies[key] = rest.join('=');
   });
 
-  const sessionToken = cookies.session;
+  let sessionToken = cookies.session;
+
+  // Fallback: check Authorization: Bearer <token> for environments where cookies are restricted
+  if (!sessionToken && req.headers.authorization) {
+    const auth = req.headers.authorization;
+    if (auth.startsWith('Bearer ')) {
+      sessionToken = auth.slice(7).trim();
+    }
+  }
+
   if (!sessionToken) return null;
 
   return verifySessionToken(sessionToken);

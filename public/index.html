@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CompanionPal — Your Caring Daily Companion</title>
   <meta name="description" content="An accessible, calm, and trustworthy GenAI companion website designed for older adults.">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/css/style.css?v=7">
 </head>
 <body>
 
@@ -48,55 +50,34 @@
     <!-- ========================================== -->
     <!-- SCREEN 1: LOGIN                            -->
     <!-- ========================================== -->
-    <section id="view-login" class="panel" aria-labelledby="login-title">
-      <div class="app-header">
-        <div class="brand-badge">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-          <span>CompanionPal</span>
-        </div>
-        <h1 id="login-title">Welcome to CompanionPal</h1>
-        <p class="sub-greeting">Your calm, patient helper for everyday tasks, letters, and questions. Please sign in below to get started.</p>
-      </div>
-
-      <form id="login-form">
-        <div class="form-group">
-          <label for="login-username">Your Username</label>
-          <input type="text" id="login-username" name="username" required autocomplete="username" placeholder="e.g. senior.demo">
+    <section id="view-login" class="login-view" aria-labelledby="login-title">
+      <div class="login-card">
+        <div class="app-header" style="margin-bottom: 24px;">
+          <div class="brand-badge">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            <span>CompanionPal</span>
+          </div>
+          <h1 id="login-title" style="font-size: calc(2rem * var(--font-scale));">Sign In</h1>
         </div>
 
-        <div class="form-group">
-          <label for="login-password">Your Password</label>
-          <input type="password" id="login-password" name="password" required autocomplete="current-password" placeholder="Enter your password">
-        </div>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" name="username" required autocomplete="username" placeholder="Username">
+          </div>
 
-        <div id="login-error" class="error-banner" hidden role="alert">
-          That did not match. Please try again.
-        </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" name="password" required autocomplete="current-password" placeholder="Password">
+          </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 14px;">
-          <span>Log In to CompanionPal</span>
-          <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </button>
-      </form>
+          <div id="login-error" class="error-banner" hidden role="alert" aria-live="polite"></div>
 
-      <!-- Reviewer Demo Login Box -->
-      <aside class="demo-box" aria-label="Reviewer Demo Credentials">
-        <h3 style="margin-bottom: 6px;">Demo Login for Testing</h3>
-        <p style="font-size: 0.95em; color: var(--text-muted); margin-bottom: 10px;">
-          These are dummy credentials for demonstration only. Click either account below to fill the login boxes automatically:
-        </p>
-        <div>
-          <button type="button" class="demo-account-chip" onclick="fillDemoAccount('senior.demo', 'Comfort#2026')">
-            <strong>Account 1:</strong> senior.demo / Comfort#2026
+          <button type="submit" class="btn btn-primary btn-block" style="width: 100%; margin-top: 14px;">
+            <span>Sign In</span>
+            <svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
-          <button type="button" class="demo-account-chip" onclick="fillDemoAccount('family.demo', 'Helper#2026')">
-            <strong>Account 2:</strong> family.demo / Helper#2026
-          </button>
-        </div>
-      </aside>
-
-      <div style="margin-top: 24px; text-align: center; font-size: 0.9em; color: var(--text-muted);">
-        <p><strong>Your Privacy:</strong> We use only a temporary login cookie to keep you signed in. We do not track you, sell your information, or store your personal data.</p>
+        </form>
       </div>
     </section>
 
@@ -110,14 +91,13 @@
           <span id="home-date">Today is Saturday, September 19, 2026.</span>
         </div>
         <h1><span id="home-greeting">Good morning</span>, <span id="home-user-name">Friend!</span></h1>
-        <p class="sub-greeting">What would you like help with today? Click any of the 5 big cards below:</p>
       </div>
 
       <nav class="feature-grid" aria-label="CompanionPal Features">
         <!-- Feature 1: Explain This -->
         <button class="feature-card-btn" id="card-explain">
           <div class="feature-card-header">
-            <div class="feature-card-icon">
+            <div class="feature-card-icon icon-explain">
               <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             </div>
             <div class="feature-card-title">1. Explain This</div>
@@ -128,7 +108,7 @@
         <!-- Feature 2: Is This a Scam? -->
         <button class="feature-card-btn" id="card-scam">
           <div class="feature-card-header">
-            <div class="feature-card-icon" style="background-color: #FEEBEB; color: var(--scam-border);">
+            <div class="feature-card-icon icon-scam">
               <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             </div>
             <div class="feature-card-title">2. Is This a Scam?</div>
@@ -139,7 +119,7 @@
         <!-- Feature 3: Step-by-Step Help -->
         <button class="feature-card-btn" id="card-steps">
           <div class="feature-card-header">
-            <div class="feature-card-icon" style="background-color: #EBF3FE; color: #1E5B99;">
+            <div class="feature-card-icon icon-steps">
               <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
             </div>
             <div class="feature-card-title">3. Step-by-Step Help</div>
@@ -150,7 +130,7 @@
         <!-- Feature 4: My Day -->
         <button class="feature-card-btn" id="card-myday">
           <div class="feature-card-header">
-            <div class="feature-card-icon" style="background-color: #FDF4E7; color: var(--careful-border);">
+            <div class="feature-card-icon icon-myday">
               <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </div>
             <div class="feature-card-title">4. My Day</div>
@@ -161,7 +141,7 @@
         <!-- Feature 5: Just Chat -->
         <button class="feature-card-btn" id="card-chat" style="grid-column: 1 / -1;">
           <div class="feature-card-header">
-            <div class="feature-card-icon" style="background-color: var(--accent-soft); color: var(--accent);">
+            <div class="feature-card-icon icon-chat">
               <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             </div>
             <div class="feature-card-title">5. Just Chat</div>
@@ -169,10 +149,6 @@
           <div class="feature-card-desc">A friendly, patient companion. Talk about your memories, ask curious questions, or just have a pleasant conversation.</div>
         </button>
       </nav>
-
-      <div style="margin-top: 36px; padding: 18px; border-radius: var(--radius-md); background-color: var(--surface); border: 1px solid var(--border); text-align: center; font-size: 0.95em; color: var(--text-muted);">
-        <p><strong>CompanionPal Privacy Guarantee:</strong> Your reminders stay privately stored on your device only. We never sell your information.</p>
-      </div>
     </section>
 
     <!-- ========================================== -->
@@ -181,18 +157,18 @@
     <section id="view-explain" hidden class="panel" aria-labelledby="explain-title">
       <div class="app-header">
         <h2 id="explain-title">Explain This</h2>
-        <p class="sub-greeting">Paste any confusing letter, medical notice, electricity bill, or government form. We will explain what it says in plain words.</p>
+        <p class="sub-greeting">Paste any letter, bill, or notice for a clear summary.</p>
       </div>
 
       <div>
-        <label for="explain-input">Paste or type the text here:</label>
-        <textarea id="explain-input" placeholder="For example: Paste the words from a utility bill, doctor's prescription note, or official letter..."></textarea>
+        <label for="explain-input">Text to explain</label>
+        <textarea id="explain-input" placeholder="Paste words from a bill, letter, or official notice..."></textarea>
       </div>
 
       <div class="sample-prompts" aria-label="Sample Examples to Try">
-        <span style="font-weight: 700; align-self: center;">Try a sample:</span>
+        <span style="font-weight: 700; align-self: center;">Samples:</span>
         <button type="button" class="sample-chip" onclick="document.getElementById('explain-input').value = 'Dear Consumer, Your electricity service will be disconnected on 25-09-2026 due to pending arrear amount of ₹1,450. Please settle the dues at the nearest sub-divisional billing counter or online to avoid penalty surcharge.';">
-          Electricity Bill Notice (India ₹)
+          Electricity Bill (India ₹)
         </button>
         <button type="button" class="sample-chip" onclick="document.getElementById('explain-input').value = 'Notice from City Water Department: Your scheduled meter replacement is set for October 4th between 9 AM and 1 PM. If you need to reschedule, please call 555-0199 by Friday at 5 PM. A \$25 rescheduling fee applies after this deadline.';">
           Water Meter Notice (US $)
@@ -205,11 +181,11 @@
       <div class="toolbar">
         <button type="button" class="btn btn-primary" id="btn-run-explain">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <span>Explain in Plain Words</span>
+          <span>Explain</span>
         </button>
         <button type="button" class="btn btn-secondary" id="btn-mic-explain">
           <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-          <span>Dictate with Voice</span>
+          <span>Dictate</span>
         </button>
         <button type="button" class="btn btn-tool" id="btn-clear-explain">Clear</button>
       </div>
@@ -224,7 +200,7 @@
       <div id="explain-result" class="result-box" hidden aria-live="polite">
         <h3>
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          <span>Summary in Simple Words</span>
+          <span>Summary</span>
         </h3>
         <div class="result-content" id="explain-content"></div>
         <div class="result-footer">
@@ -242,16 +218,16 @@
     <section id="view-scam" hidden class="panel" aria-labelledby="scam-title">
       <div class="app-header">
         <h2 id="scam-title">Is This a Scam?</h2>
-        <p class="sub-greeting">Received a strange phone call, text message, WhatsApp forward, or email? Paste it here to see if it is safe.</p>
+        <p class="sub-greeting">Check if a suspicious message, call, or email is safe.</p>
       </div>
 
       <div>
-        <label for="scam-input">Paste the message or describe what they said:</label>
-        <textarea id="scam-input" placeholder="For example: Someone called claiming my bank account will be blocked unless I give them a code right away..."></textarea>
+        <label for="scam-input">Message or details</label>
+        <textarea id="scam-input" placeholder="Paste the text message, email, or describe what was said..."></textarea>
       </div>
 
       <div class="sample-prompts" aria-label="Sample Messages to Test">
-        <span style="font-weight: 700; align-self: center;">Try an example:</span>
+        <span style="font-weight: 700; align-self: center;">Samples:</span>
         <button type="button" class="sample-chip" onclick="document.getElementById('scam-input').value = 'URGENT: Dear customer, your SBI bank electricity bill is unpaid. Your power will be disconnected tonight at 9:30 PM. Contact electricity officer immediately on 98765-43210 to update your KYC or download quick-support app.';">
           Power Cut / KYC Threat (Scam)
         </button>
@@ -259,18 +235,18 @@
           IRS Tax Arrest Threat (Scam)
         </button>
         <button type="button" class="sample-chip" onclick="document.getElementById('scam-input').value = 'Hi Grandpa, this is your appointment reminder for your annual physical exam with Dr. Evans on Thursday at 2:00 PM. Please reply YES to confirm. No payment or personal information is needed.';">
-          Legitimate Doctor Reminder (Safe)
+          Doctor Reminder (Safe)
         </button>
       </div>
 
       <div class="toolbar">
         <button type="button" class="btn btn-primary" id="btn-run-scam">
           <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
-          <span>Check If This Is Safe</span>
+          <span>Check Message</span>
         </button>
         <button type="button" class="btn btn-secondary" id="btn-mic-scam">
           <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-          <span>Dictate with Voice</span>
+          <span>Dictate</span>
         </button>
         <button type="button" class="btn btn-tool" id="btn-clear-scam">Clear</button>
       </div>
@@ -308,16 +284,16 @@
     <section id="view-steps" hidden class="panel" aria-labelledby="steps-title-header">
       <div class="app-header">
         <h2 id="steps-title-header">Step-by-Step Help</h2>
-        <p class="sub-greeting">Ask how to do any task on your phone, computer, or TV. We will guide you one simple step at a time.</p>
+        <p class="sub-greeting">Simple guidance, one step at a time.</p>
       </div>
 
       <div>
         <label for="steps-input">What would you like help doing?</label>
-        <input type="text" id="steps-input" placeholder="e.g. How do I make a video call to my grandson on WhatsApp?">
+        <input type="text" id="steps-input" placeholder="e.g. How do I make a video call on WhatsApp?">
       </div>
 
       <div class="sample-prompts" aria-label="Sample Questions to Try">
-        <span style="font-weight: 700; align-self: center;">Try an idea:</span>
+        <span style="font-weight: 700; align-self: center;">Samples:</span>
         <button type="button" class="sample-chip" onclick="document.getElementById('steps-input').value = 'How do I start a video call on WhatsApp?';">
           Video Call on WhatsApp
         </button>
@@ -332,11 +308,11 @@
       <div class="toolbar">
         <button type="button" class="btn btn-primary" id="btn-run-steps">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Show Me the Steps</span>
+          <span>Show Steps</span>
         </button>
         <button type="button" class="btn btn-secondary" id="btn-mic-steps">
           <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-          <span>Ask by Voice</span>
+          <span>Dictate</span>
         </button>
       </div>
 
@@ -348,23 +324,23 @@
       <div id="steps-error" class="error-banner" hidden role="alert"></div>
 
       <div id="steps-viewer" hidden aria-live="polite">
-        <h3 id="steps-title" style="margin-bottom: 14px; text-align: center;"></h3>
+        <h3 id="steps-title" style="margin-bottom: 24px; text-align: center;"></h3>
 
-        <div class="step-card">
+        <div class="step-view-container">
           <div class="step-indicator" id="step-indicator">Step 1 of 4</div>
           <div class="step-instruction" id="step-instruction"></div>
           <div class="step-tip" id="step-tip"></div>
 
           <div class="step-nav">
             <button type="button" class="btn btn-secondary" id="btn-prev-step" disabled>
-              ← Previous Step
+              ← Previous
             </button>
             <button type="button" class="btn btn-tool" id="btn-speak-step">
               <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-              <span>Read Step Aloud</span>
+              <span>Read Aloud</span>
             </button>
             <button type="button" class="btn btn-primary" id="btn-next-step">
-              Next Step →
+              Next →
             </button>
           </div>
         </div>
@@ -377,13 +353,13 @@
     <section id="view-myday" hidden class="panel" aria-labelledby="myday-title">
       <div class="app-header">
         <h2 id="myday-title">My Day</h2>
-        <p class="sub-greeting">Your medicines, doctor appointments, and family calls. Get a warm daily briefing whenever you like.</p>
+        <p class="sub-greeting">Your daily schedule and reminders.</p>
       </div>
 
       <div style="text-align: center; margin-bottom: 24px;">
-        <button type="button" class="btn btn-primary" id="btn-run-briefing" style="font-size: calc(1.1rem * var(--font-scale)); min-height: 64px;">
+        <button type="button" class="btn btn-primary" id="btn-run-briefing" style="font-size: calc(1.05rem * var(--font-scale)); min-height: 58px;">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line></svg>
-          <span>Get Today's Friendly AI Briefing</span>
+          <span>Get Daily Briefing</span>
         </button>
       </div>
 
@@ -397,7 +373,7 @@
       <div id="myday-briefing-result" class="result-box" hidden aria-live="polite">
         <h3>
           <svg class="icon" viewBox="0 0 24 24"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
-          <span>Your Daily Briefing</span>
+          <span>Today's Briefing</span>
         </h3>
         <div class="result-content" id="myday-briefing-content"></div>
         <div class="result-footer">
@@ -408,18 +384,18 @@
         </div>
       </div>
 
-      <hr style="margin: 28px 0; border: none; border-top: 2px solid var(--border);">
+      <hr style="margin: 28px 0; border: none; border-top: 1.5px solid var(--border);">
 
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-        <h3>Your Reminders List</h3>
+        <h3>Your Reminders</h3>
         <button type="button" class="btn btn-secondary" id="btn-show-add-reminder">
           <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          <span>Add a Reminder</span>
+          <span>Add Reminder</span>
         </button>
       </div>
 
-      <!-- Add Reminder Form (Collapsible) -->
-      <div id="add-reminder-form" hidden style="margin-top: 18px; padding: 20px; background-color: var(--surface-alt); border-radius: var(--radius-md); border: 2px solid var(--border);">
+      <!-- Add Reminder Form (Inline clean section, not a nested card) -->
+      <div id="add-reminder-form" class="inline-form-panel" hidden>
         <h4 style="margin-bottom: 12px;">New Reminder</h4>
         <div class="form-group">
           <label for="rem-time">Time</label>
@@ -430,11 +406,11 @@
           <input type="text" id="rem-title" placeholder="e.g. Blood pressure medicine after breakfast">
         </div>
         <div class="form-group">
-          <label for="rem-note">Any extra note (optional)</label>
+          <label for="rem-note">Note (optional)</label>
           <input type="text" id="rem-note" placeholder="e.g. Drink a full glass of warm water">
         </div>
         <div class="toolbar">
-          <button type="button" class="btn btn-primary" id="btn-save-reminder">Save Reminder</button>
+          <button type="button" class="btn btn-primary" id="btn-save-reminder">Save</button>
           <button type="button" class="btn btn-tool" id="btn-cancel-reminder">Cancel</button>
         </div>
       </div>
@@ -448,7 +424,7 @@
     <section id="view-chat" hidden class="panel" aria-labelledby="chat-title">
       <div class="app-header">
         <h2 id="chat-title">Just Chat</h2>
-        <p class="sub-greeting">A patient, friendly companion. Ask any question, share a memory, or talk about your day. No rush, ever.</p>
+        <p class="sub-greeting">A friendly companion. Talk about anything on your mind.</p>
       </div>
 
       <div class="chat-window" id="chat-window" role="log" aria-live="polite" aria-label="Conversation with CompanionPal">
@@ -459,7 +435,7 @@
 
       <div id="chat-loading" class="loading-box" hidden aria-live="polite">
         <div class="spinner"></div>
-        <span>CompanionPal is thinking...</span>
+        <span>Thinking, one moment...</span>
       </div>
 
       <div id="chat-error" class="error-banner" hidden role="alert"></div>
@@ -472,15 +448,15 @@
         </button>
         <button type="button" class="btn btn-secondary" id="btn-mic-chat">
           <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-          <span>Speak</span>
+          <span>Dictate</span>
         </button>
       </div>
     </section>
 
   </main>
 
-  <script src="/js/speech.js"></script>
-  <script src="/js/storage.js"></script>
-  <script src="/js/app.js"></script>
+  <script defer src="/js/speech.js?v=7"></script>
+  <script defer src="/js/storage.js?v=7"></script>
+  <script defer src="/js/app.js?v=7"></script>
 </body>
 </html>

@@ -49,6 +49,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Set-Cookie', cookie);
   return res.status(200).json({
     ok: true,
+    token: token,
     username: result.username,
     message: 'Welcome back!'
   });

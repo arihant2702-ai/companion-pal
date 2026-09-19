@@ -67,7 +67,7 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const { feature, text, reminders, currentTime, currentDate, history } = body || {};
+  const { feature, text, reminders, currentTime, currentDate, history, stream } = body || {};
 
   if (!feature) {
     return res.status(400).json({ error: 'Please choose which feature you would like to use.' });
@@ -75,6 +75,51 @@ module.exports = async function handler(req, res) {
 
   // 4. Validate and execute feature
   try {
+    if (stream && (feature === 'explain' || feature === 'myday' || feature === 'chat')) {
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      const sendChunk = (chunk) => {
+        res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
+      };
+
+      let resultData;
+      if (feature === 'explain') {
+        const sanitized = sanitizeInput(text);
+        if (!sanitized) return res.status(400).json({ error: 'Please enter or paste the letter or notice you would like explained.' });
+        resultData = await handleExplain(sanitized, sendChunk);
+      } else if (feature === 'myday') {
+        const safeReminders = Array.isArray(reminders)
+          ? reminders.map(r => ({
+              title: sanitizeInput(r.title),
+              time: sanitizeInput(r.time),
+              note: sanitizeInput(r.note)
+            }))
+          : [];
+        resultData = await handleMyDay({
+          reminders: safeReminders,
+          currentTime: sanitizeInput(currentTime),
+          currentDate: sanitizeInput(currentDate),
+          username: user.username
+        }, sendChunk);
+      } else if (feature === 'chat') {
+        const sanitized = sanitizeInput(text);
+        if (!sanitized) return res.status(400).json({ error: 'Please type a message to chat with CompanionPal.' });
+        const safeHistory = Array.isArray(history)
+          ? history.map(h => ({
+              role: h.role === 'model' || h.role === 'assistant' ? 'model' : 'user',
+              content: sanitizeInput(h.content)
+            }))
+          : [];
+        resultData = await handleChat({ message: sanitized, history: safeHistory }, sendChunk);
+      }
+
+      res.write(`data: ${JSON.stringify({ done: true, full: resultData.result })}\n\n`);
+      res.end();
+      return;
+    }
+
     if (feature === 'explain') {
       const sanitized = sanitizeInput(text);
       if (!sanitized) {
@@ -145,6 +190,7 @@ module.exports = async function handler(req, res) {
       const data = await handleChat({ message: sanitized, history: safeHistory });
       return res.status(200).json(data);
     }
+
 
     return res.status(400).json({ error: `Unknown feature: "${feature}".` });
   } catch (err) {

@@ -10,18 +10,12 @@
  * - 30s timeout and 1 automatic retry for transient network errors.
  */
 
-const SYSTEM_PROMPT_BASE = `You are CompanionPal, a patient, warm, and trustworthy daily AI companion specially designed for older adults.
-
-Your core guidelines:
-1. Tone: Always kind, calm, respectful, and encouraging. Never talk down, sound rushed, or use tech jargon.
-2. Language: Short sentences, simple words, clear Grade-6 reading level. Break information into easy-to-digest parts.
-3. Contextual Awareness: Be sensitive to regional context across India, the US, the UK, and globally. Notice currency symbols (₹ rupees, $ dollars, £ pounds, € euros), date formats, local institutions (e.g., electricity boards, banks, Medicare/NHS/Aadhaar/PAN/IRS), and cultural customs. Adapt your explanations to the user's specific context.
-4. Safety First:
-   - For health and medical matters: Give general information only and warmly suggest asking a doctor or nurse.
-   - For legal and financial matters: Give general guidance only and advise consulting a trusted advisor or family member.
-   - For emergencies or feeling unsafe: Immediately advise calling local emergency services (such as 112 in India and Europe, 911 in the US/Canada, or 999 in the UK) or contacting a trusted family member or neighbor right away.
-   - Privacy: Never ask for passwords, bank card numbers, OTPs (one-time pins), or government IDs. Explicitly warn the user never to share these numbers with anyone over phone or text.
-5. Closing: Always finish your message with: "Would you like me to explain anything again?"`;
+const SYSTEM_PROMPT_BASE = `You are CompanionPal, a patient, kind, and trustworthy daily AI companion for older adults.
+Guidelines:
+1. Tone & Style: Respectful, warm, simple, Grade-6 reading level. Short sentences. No tech jargon.
+2. Context: Culturally aware (India ₹/Aadhaar/KYC, US $/Medicare, UK £/NHS, etc.). Adapt currency & dates to user context.
+3. Safety: Medical/legal = general info only, advise consulting a professional. Emergency = advise local emergency services (112 / 911 / 999). Never request passwords, OTPs, or IDs.
+4. Closing: End with: "Would you like me to explain anything again?"`;
 
 const DISCLAIMER_FOOTER = "\n\nAI can make mistakes. Please double-check important things.";
 
@@ -34,38 +28,43 @@ async function callGeminiApi({ systemInstruction, contents, generationConfig = {
     throw new Error('GEMINI_KEY_MISSING: Gemini API key is not configured on the server. Please add your key to the environment variables.');
   }
 
-  const configuredModel = process.env.GEMINI_MODEL || 'gemini-3.7-flash';
-  const candidateModels = [configuredModel, 'gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
+  const configuredModel = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  const candidateModels = [configuredModel, 'gemini-3.1-flash-lite', 'gemini-3.7-flash'];
   // Deduplicate candidate models
   const modelsToTry = [...new Set(candidateModels)];
-
-  const body = {
-    contents,
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 3000,
-      ...generationConfig
-    }
-  };
-
-  if (systemInstruction) {
-    body.systemInstruction = {
-      parts: [{ text: systemInstruction }]
-    };
-  }
 
   let lastError = null;
 
   for (const model of modelsToTry) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
     let attempts = 0;
-    const maxAttempts = 2; // up to 2 attempts per model
+    const maxAttempts = 2;
+
+    const currentConfig = {
+      temperature: 0.3,
+      maxOutputTokens: 800,
+      ...generationConfig
+    };
+    if (model.includes('3.7')) {
+      currentConfig.thinkingConfig = { thinkingBudget: 0 };
+    }
+
+    const body = {
+      contents,
+      generationConfig: currentConfig
+    };
+
+    if (systemInstruction) {
+      body.systemInstruction = {
+        parts: [{ text: systemInstruction }]
+      };
+    }
 
     while (attempts < maxAttempts) {
       attempts++;
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
 
         const response = await fetch(url, {
           method: 'POST',
@@ -78,14 +77,13 @@ async function callGeminiApi({ systemInstruction, contents, generationConfig = {
 
         if (!response.ok) {
           const errorText = await response.text();
-          // Check if temporary demand spike (503 or 429)
           if (response.status === 503 || response.status === 429) {
             lastError = new Error(`Gemini model ${model} temporarily unavailable (${response.status})`);
             if (attempts < maxAttempts) {
-              await new Promise(res => setTimeout(res, 2500));
+              await new Promise(res => setTimeout(res, 1500));
               continue;
             }
-            break; // Move to next model if retry also failed
+            break;
           }
           throw new Error(`Gemini API error (${response.status}): ${errorText}`);
         }
@@ -105,7 +103,7 @@ async function callGeminiApi({ systemInstruction, contents, generationConfig = {
       } catch (err) {
         lastError = err;
         if (attempts < maxAttempts && !err.message.includes('503')) {
-          await new Promise(res => setTimeout(res, 1500));
+          await new Promise(res => setTimeout(res, 1000));
         }
       }
     }
@@ -115,9 +113,84 @@ async function callGeminiApi({ systemInstruction, contents, generationConfig = {
 }
 
 /**
+ * Stream responses from Google Gemini API with SSE chunk callback.
+ */
+async function streamGeminiApi({ systemInstruction, contents, generationConfig = {}, onChunk }) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey === 'your_gemini_api_key_here' || apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
+    throw new Error('GEMINI_KEY_MISSING: Gemini API key is not configured on the server. Please add your key to the environment variables.');
+  }
+
+  const model = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse&key=${encodeURIComponent(apiKey)}`;
+
+  const body = {
+    contents,
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 800,
+      ...generationConfig
+    }
+  };
+
+  if (systemInstruction) {
+    body.systemInstruction = {
+      parts: [{ text: systemInstruction }]
+    };
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini streaming error (${response.status}): ${errorText}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let fullText = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop(); // keep last partial line
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('data: ')) {
+        const jsonStr = trimmed.slice(6).trim();
+        if (jsonStr) {
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const candidate = parsed.candidates && parsed.candidates[0];
+            const part = candidate?.content?.parts?.[0];
+            if (part && part.text) {
+              fullText += part.text;
+              if (typeof onChunk === 'function') {
+                onChunk(part.text);
+              }
+            }
+          } catch {}
+        }
+      }
+    }
+  }
+
+  return fullText;
+}
+
+
+/**
  * FEATURE 1: Explain This
  */
-async function handleExplain(userText) {
+async function handleExplain(userText, onChunk) {
   const prompt = `Please explain the following text for an older adult in simple, comforting, plain language:
 "${userText}"
 
@@ -127,6 +200,18 @@ Format your response cleanly with these 3 clear sections:
 3. Important Dates or Deadlines: (Any due date, payment deadline, or appointment date found, or "No specific deadline mentioned.")
 
 Keep reading level at Grade 6. End with "Would you like me to explain anything again?"`;
+
+  if (typeof onChunk === 'function') {
+    const text = await streamGeminiApi({
+      systemInstruction: SYSTEM_PROMPT_BASE,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      onChunk
+    });
+    return {
+      feature: 'explain',
+      result: text.trim() + DISCLAIMER_FOOTER
+    };
+  }
 
   const text = await callGeminiApi({
     systemInstruction: SYSTEM_PROMPT_BASE,
@@ -258,7 +343,7 @@ You must respond ONLY with a JSON object adhering exactly to this format:
 /**
  * FEATURE 4: My Day (Proactive Daily Briefing)
  */
-async function handleMyDay({ reminders, currentTime, currentDate, username }) {
+async function handleMyDay({ reminders, currentTime, currentDate, username }, onChunk) {
   const reminderList = Array.isArray(reminders) && reminders.length > 0
     ? reminders.map(r => `- ${r.time ? r.time + ': ' : ''}${r.title}${r.note ? ' (' + r.note + ')' : ''}`).join('\n')
     : "No reminders set yet for today.";
@@ -276,6 +361,18 @@ Please provide:
 3. A friendly health or wellness nudge (e.g., drink a glass of water, stretch your legs, or enjoy a quiet moment).
 4. End with: "Would you like me to explain anything again?"`;
 
+  if (typeof onChunk === 'function') {
+    const text = await streamGeminiApi({
+      systemInstruction: SYSTEM_PROMPT_BASE,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      onChunk
+    });
+    return {
+      feature: 'myday',
+      result: text.trim() + DISCLAIMER_FOOTER
+    };
+  }
+
   const text = await callGeminiApi({
     systemInstruction: SYSTEM_PROMPT_BASE,
     contents: [{ role: 'user', parts: [{ text: prompt }] }]
@@ -291,11 +388,11 @@ Please provide:
  * FEATURE 5: Just Chat
  * Maintains conversational context.
  */
-async function handleChat({ message, history = [] }) {
+async function handleChat({ message, history = [] }, onChunk) {
   const formattedContents = [];
 
-  // Include up to last 8 turns of conversation for context
-  const recentHistory = Array.isArray(history) ? history.slice(-8) : [];
+  // Include up to last 6 turns of conversation for context (light & fast)
+  const recentHistory = Array.isArray(history) ? history.slice(-6) : [];
   for (const turn of recentHistory) {
     if (turn.role && turn.content) {
       formattedContents.push({
@@ -311,9 +408,23 @@ async function handleChat({ message, history = [] }) {
     parts: [{ text: String(message) }]
   });
 
+  const chatInstruction = `${SYSTEM_PROMPT_BASE}
+You are having an ongoing friendly conversation. Be a patient listener. Always ask before assuming. Offer to repeat or simplify whenever helpful. Always end your message with: "Would you like me to explain anything again?"`;
+
+  if (typeof onChunk === 'function') {
+    const text = await streamGeminiApi({
+      systemInstruction: chatInstruction,
+      contents: formattedContents,
+      onChunk
+    });
+    return {
+      feature: 'chat',
+      result: text.trim() + DISCLAIMER_FOOTER
+    };
+  }
+
   const text = await callGeminiApi({
-    systemInstruction: `${SYSTEM_PROMPT_BASE}
-You are having an ongoing friendly conversation. Be a patient listener. Always ask before assuming. Offer to repeat or simplify whenever helpful. Always end your message with: "Would you like me to explain anything again?"`,
+    systemInstruction: chatInstruction,
     contents: formattedContents
   });
 
@@ -325,9 +436,11 @@ You are having an ongoing friendly conversation. Be a patient listener. Always a
 
 module.exports = {
   callGeminiApi,
+  streamGeminiApi,
   handleExplain,
   handleScam,
   handleSteps,
   handleMyDay,
   handleChat
 };
+
