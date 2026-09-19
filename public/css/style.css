@@ -168,10 +168,21 @@ p, li, label, input, textarea {
   line-height: var(--font-line-height);
 }
 
-/* Top Accessibility Bar (No Glassmorphism, 56px Minimum Touch Targets) */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+section:not([hidden]) {
+  animation: slideUpFade 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Top Accessibility Bar */
 .a11y-bar:not([hidden]) {
-  background-color: var(--surface);
-  border-bottom: 2px solid var(--border);
+  background: rgba(250, 248, 245, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1.5px solid var(--border);
   padding: var(--space-2) var(--space-3);
   display: flex;
   flex-wrap: wrap;
@@ -181,7 +192,9 @@ p, li, label, input, textarea {
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 4px 16px rgba(35, 32, 28, 0.03);
 }
+
 
 .a11y-group {
   display: flex;
@@ -361,19 +374,37 @@ button:active, .btn:active, .btn-tool:active {
   background-color: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  min-height: 156px;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  box-shadow: 0 4px 20px rgba(35, 32, 28, 0.04);
+  min-height: 160px;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
   color: var(--text-main);
   width: 100%;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: slideUpFade 300ms ease cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.feature-card-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: transparent;
+  transition: background-color 200ms ease;
 }
 
 .feature-card-btn:hover {
   border-color: var(--primary);
   background-color: #FFFFFF;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(35, 32, 28, 0.08);
+}
+
+.feature-card-btn:hover::before {
+  background-color: var(--primary);
 }
 
 .feature-card-header {
@@ -385,44 +416,55 @@ button:active, .btn:active, .btn-tool:active {
 }
 
 .feature-card-icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 200ms ease;
+}
+
+.feature-card-btn:hover .feature-card-icon {
+  transform: scale(1.05);
 }
 
 .icon-explain {
-  background-color: var(--accent-soft);
-  color: var(--accent);
+  background-color: #EAF4F2;
+  color: #184D45;
+  border: 1px solid #C2E2DD;
 }
 
 .icon-scam {
-  background-color: var(--scam-bg);
-  color: var(--scam-border);
+  background-color: #FFF3EE;
+  color: #D96B43;
+  border: 1px solid #FAD5C5;
 }
 
 .icon-steps {
-  background-color: var(--safe-bg);
-  color: var(--safe-border);
+  background-color: #F9F1ED;
+  color: #A8583B;
+  border: 1px solid #EBD5C9;
 }
 
 .icon-myday {
-  background-color: var(--careful-bg);
-  color: var(--careful-border);
+  background-color: #FFF9EE;
+  color: #C98A2C;
+  border: 1px solid #FBE8C4;
 }
 
 .icon-chat {
-  background-color: var(--surface-alt);
-  color: var(--primary);
+  background-color: #EEF8F7;
+  color: #2C7A70;
+  border: 1px solid #C4EAE6;
 }
 
 .feature-card-title {
   font-size: var(--font-h3);
   font-weight: 700;
   color: var(--text-main);
+  font-family: 'Fraunces', Georgia, serif;
 }
 
 .feature-card-desc {
@@ -430,6 +472,7 @@ button:active, .btn:active, .btn-tool:active {
   font-size: var(--font-body);
   line-height: 1.5;
 }
+
 
 /* Forms & Inputs */
 .form-group {
