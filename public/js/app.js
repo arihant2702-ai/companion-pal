@@ -62,6 +62,11 @@ function formatDisplayName(username) {
 }
 
 function showScreen(screenName) {
+  // Strict Navigation Guard: Always lock to 'login' page if not authenticated
+  if (!currentUser && screenName !== 'login') {
+    screenName = 'login';
+  }
+
   currentScreen = screenName;
   window.CompanionSpeech.stopSpeaking();
 
