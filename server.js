@@ -72,6 +72,12 @@ function enhanceResponse(res) {
   };
 }
 
+// Pre-load API route handlers to avoid per-request require overhead
+const apiLogin = require('./api/login');
+const apiLogout = require('./api/logout');
+const apiChat = require('./api/chat');
+const apiHealth = require('./api/health');
+
 const server = http.createServer(async (req, res) => {
   applySecurityHeaders(req, res);
   enhanceResponse(res);
@@ -109,13 +115,13 @@ const server = http.createServer(async (req, res) => {
 
       try {
         if (pathname === '/api/login') {
-          return await require('./api/login')(req, res);
+          return await apiLogin(req, res);
         } else if (pathname === '/api/logout') {
-          return await require('./api/logout')(req, res);
+          return await apiLogout(req, res);
         } else if (pathname === '/api/chat') {
-          return await require('./api/chat')(req, res);
+          return await apiChat(req, res);
         } else if (pathname === '/api/health') {
-          return await require('./api/health')(req, res);
+          return await apiHealth(req, res);
         } else {
           return res.status(404).json({ error: 'Endpoint not found.' });
         }
@@ -161,8 +167,18 @@ const server = http.createServer(async (req, res) => {
     const ext = path.extname(filePath).toLowerCase();
     const mime = MIME_TYPES[ext] || 'application/octet-stream';
     res.setHeader('Content-Type', mime);
+
+    // Bandwidth & Memory Optimization: HTTP 304 ETag Caching
+    const etag = `W/"${stats.size}-${stats.mtime.getTime()}"`;
+    res.setHeader('ETag', etag);
+    if (req.headers['if-none-match'] === etag) {
+      res.statusCode = 304;
+      res.end();
+      return;
+    }
+
     if (ext === '.css' || ext === '.js' || ext === '.svg' || ext === '.png' || ext === '.jpg' || ext === '.ico') {
-      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
     } else {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
@@ -171,6 +187,7 @@ const server = http.createServer(async (req, res) => {
     stream.pipe(res);
   });
 });
+
 
 if (require.main === module) {
   server.listen(PORT, () => {

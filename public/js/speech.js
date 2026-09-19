@@ -112,11 +112,13 @@ function toggleDictation(targetInputElement, onStatusChange) {
   recognition.onerror = (err) => {
     console.warn('Speech recognition error:', err.error);
     isListening = false;
+    recognition = null;
     if (onStatusChange) onStatusChange(false);
   };
 
   recognition.onend = () => {
     isListening = false;
+    recognition = null;
     if (onStatusChange) onStatusChange(false);
   };
 
@@ -125,9 +127,11 @@ function toggleDictation(targetInputElement, onStatusChange) {
   } catch (err) {
     console.error('Could not start microphone:', err);
     isListening = false;
+    recognition = null;
     if (onStatusChange) onStatusChange(false);
   }
 }
+
 
 window.CompanionSpeech = {
   isSpeechSynthesisSupported,

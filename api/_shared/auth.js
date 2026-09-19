@@ -5,6 +5,21 @@ const loginAttempts = new Map();
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 60 * 1000; // 1 minute
 
+// Prune expired rate limit entries every 5 minutes to prevent memory leaks
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, attempts] of loginAttempts.entries()) {
+      const valid = attempts.filter(time => now - time < WINDOW_MS);
+      if (valid.length === 0) {
+        loginAttempts.delete(ip);
+      } else {
+        loginAttempts.set(ip, valid);
+      }
+    }
+  }, 5 * 60 * 1000).unref();
+}
+
 /**
  * Perform a constant-time string comparison to prevent timing attacks.
  */

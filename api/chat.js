@@ -11,6 +11,21 @@ const {
 const userCallHistory = new Map();
 const MAX_CALLS_PER_MINUTE = 20;
 
+// Prune expired AI call records every 5 minutes to prevent memory leaks
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [user, times] of userCallHistory.entries()) {
+      const valid = times.filter(t => now - t < 60000);
+      if (valid.length === 0) {
+        userCallHistory.delete(user);
+      } else {
+        userCallHistory.set(user, valid);
+      }
+    }
+  }, 5 * 60 * 1000).unref();
+}
+
 function checkUserAiRateLimit(username) {
   const now = Date.now();
   const times = userCallHistory.get(username) || [];

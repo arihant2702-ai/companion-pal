@@ -139,51 +139,60 @@ async function streamGeminiApi({ systemInstruction, contents, generationConfig =
     };
   }
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini streaming error (${response.status}): ${errorText}`);
-  }
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  let fullText = '';
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Gemini streaming error (${response.status}): ${errorText}`);
+    }
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop(); // keep last partial line
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
 
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('data: ')) {
-        const jsonStr = trimmed.slice(6).trim();
-        if (jsonStr) {
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const candidate = parsed.candidates && parsed.candidates[0];
-            const part = candidate?.content?.parts?.[0];
-            if (part && part.text) {
-              fullText += part.text;
-              if (typeof onChunk === 'function') {
-                onChunk(part.text);
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep last partial line
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('data: ')) {
+          const jsonStr = trimmed.slice(6).trim();
+          if (jsonStr) {
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const candidate = parsed.candidates && parsed.candidates[0];
+              const part = candidate?.content?.parts?.[0];
+              if (part && part.text) {
+                fullText += part.text;
+                if (typeof onChunk === 'function') {
+                  onChunk(part.text);
+                }
               }
-            }
-          } catch {}
+            } catch {}
+          }
         }
       }
     }
+
+    return fullText;
+  } finally {
+    clearTimeout(timeoutId);
   }
 
-  return fullText;
 }
 
 

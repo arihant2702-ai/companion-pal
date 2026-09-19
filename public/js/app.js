@@ -624,6 +624,9 @@ async function sendChatMessage() {
     }
     appendChatBubble('model', data.result);
     chatHistory.push({ role: 'model', content: data.result });
+    if (chatHistory.length > 16) {
+      chatHistory = chatHistory.slice(-16);
+    }
   } catch (err) {
     loadingEl.hidden = true;
     if (modelBubble) modelBubble.remove();
