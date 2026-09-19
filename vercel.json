@@ -1,8 +1,11 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/public/$1" }
+    { "source": "/api/login",   "destination": "/api/login" },
+    { "source": "/api/logout",  "destination": "/api/logout" },
+    { "source": "/api/chat",    "destination": "/api/chat" },
+    { "source": "/api/health",  "destination": "/api/health" },
+    { "source": "/(.*)",        "destination": "/public/$1" }
   ],
   "headers": [
     {
